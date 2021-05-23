@@ -1,0 +1,23 @@
+{
+  "name": "fan-nft",
+  "version": "0.0.1",
+  "description": "a tool for KoL create NFT for his/her fans",
+  "main": "index.js",
+  "author": "script-money",
+  "license": "MIT",
+  "rootDir": "src",
+  "devDependencies": {
+    "@types/node": "^15.6.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.2",
+    "@onflow/types": "^0.0.4",
+    "babel-jest": "^26.6.3",
+    "flow-js-testing": "^0.1.8-beta.0",
+    "jest": "^26.6.3"
+  },
+  "scripts": {
+    "test": "jest --config ./jest.config.js"
+  }
+}

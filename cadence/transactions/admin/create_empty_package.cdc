@@ -1,4 +1,5 @@
-import FanNFT from 0xFANNFTADDRESS
+// import FanNFT from 0xFANNFTADDRESS
+import FanNFT from 0xf8d6e0586b0a20c7
 
 // 该transaction用于Giver创建Package时，初始化Package Resource
 // 然后存储在FanNFT的合约中

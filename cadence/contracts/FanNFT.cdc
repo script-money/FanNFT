@@ -26,6 +26,11 @@ pub contract FanNFT: NonFungibleToken {
 
     pub event Deposit(id: UInt64, to: Address?)
 
+    pub let PackageStoragePath: StoragePath
+
+    pub let PackagePublicPath: PublicPath
+
+    pub let AdminStoragePath: StoragePath
 
     // 用于前端的礼包列表信息
     //
@@ -56,10 +61,10 @@ pub contract FanNFT: NonFungibleToken {
 
     // Package资源逻辑
     //
-    pub resource Package{
+    pub resource Package {
       pub var packageID: UInt32
       pub var planTotalNumber: UInt32
-      pub var actualTotalNumber: UInt32
+      pub var actualTotalNumber: UInt64
 
       pub var numberGiftMinted: UInt32
 
@@ -84,10 +89,9 @@ pub contract FanNFT: NonFungibleToken {
 
       pub fun setActualTotalNumber(number: UInt64){
         pre {
-          self.actualTotalNumber == (0 as UInt32): "actualTotalNumber should be empty"
+          self.actualTotalNumber == (0 as UInt64): "actualTotalNumber should be empty"
         }
         self.actualTotalNumber = number
-        FanNFT.packageDatas[self.packageID].actualTotalNumber = number
       }
     
       pub fun mintGift(giftID: UInt64): @NFT{
@@ -253,21 +257,17 @@ pub contract FanNFT: NonFungibleToken {
     // Admin用于倒计时完成时mint礼物，存储在账户中等用户claim。
     //
     pub resource Admin{
-        pub fun borrowPackage(packageID: UInt32): &FanNFT.Package{
-          pre {
-            FanNFT.packages[packageID] != nil: "Cannot borrow Package: The Package doesn't exist"
-          }
-          return &FanNFT.packages[packageID] as &FanNFT.Package 
+      pub fun borrowPackage(packageID: UInt32): &FanNFT.Package {
+        pre {
+          FanNFT.packages[packageID] != nil: "Cannot borrow Package: The Package doesn't exist"
         }
+        return &FanNFT.packages[packageID] as &FanNFT.Package 
+      }
 
-        pub fun createGifts(packageID: UInt32, actualNum: UInt32) {
-            FanNFT.package.batchMintGift(packageID, actualNum)
-        }
-
-        pub fun createPackage(name: String, metadata: {String: String}, totalNumber: UInt32){
-          var newPackage <- create Package(name:name, metadata:metadata, totalNumber:totalNumber)
-          FanNFT.packages[newPackage.packageID] <-! newPackage
-        }
+      pub fun createPackage(name: String, metadata: {String: String}, totalNumber: UInt32){
+        var newPackage <- create Package(name:name, metadata:metadata, totalNumber:totalNumber)
+        FanNFT.packages[newPackage.packageID] <-! newPackage
+      }
     }
 
     init() {
@@ -276,11 +276,16 @@ pub contract FanNFT: NonFungibleToken {
       self.nextGiftID = 0
       self.packageDatas = {}
       self.packages <- {}
-      self.account.save<@Collection>(<- create Collection(), to: /storage/PackageCollection)
+      self.PackageStoragePath = /storage/FanNFTPackageCollection
+      self.PackagePublicPath = /public/FanNFTPackageCollection
+      self.AdminStoragePath = /storage/FanNFTAdmin
 
-      self.account.link<&{PackageCollectionPublic}>(/public/PackageCollection, target: /storage/PackageCollection)
 
-      self.account.save<@Admin>(<- create Admin(), to: /storage/GiftAdmin)
+      self.account.save<@Collection>(<- create Collection(), to: self.PackageStoragePath)
+
+      self.account.link<&{PackageCollectionPublic}>(self.PackagePublicPath, target: self.PackageStoragePath)
+
+      self.account.save<@Admin>(<- create Admin(), to: self.AdminStoragePath)
 
       emit ContractInitialized()
     }

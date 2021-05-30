@@ -26,11 +26,13 @@ pub contract FanNFT: NonFungibleToken {
 
     pub event Deposit(id: UInt64, to: Address?)
 
-    pub let PackageStoragePath: StoragePath
+    pub let GiftStoragePath: StoragePath
 
-    pub let PackagePublicPath: PublicPath
+    pub let GiftPublicPath: PublicPath
 
     pub let AdminStoragePath: StoragePath
+
+    pub let AdminPublicPath: PublicPath
 
     // 用于前端的礼包列表信息
     //
@@ -152,7 +154,7 @@ pub contract FanNFT: NonFungibleToken {
     //  Collection 是用户拥有的NFT的集合，实现于标准NFT合约的Collection接口
     //  NFTs会存储在他们自己的账户内
     //
-    pub resource Collection: PackageCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+    pub resource Collection: GiftCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
 
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
@@ -233,7 +235,7 @@ pub contract FanNFT: NonFungibleToken {
 
     // 用户可以映射他们收到的礼物来允许他人deposit的接口，也用于读取账户中的礼物ID
     //
-    pub resource interface PackageCollectionPublic {
+    pub resource interface GiftCollectionPublic {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun batchDeposit(tokens: @NonFungibleToken.Collection)
         pub fun getIDs(): [UInt64]
@@ -246,6 +248,12 @@ pub contract FanNFT: NonFungibleToken {
         }
     }
 
+    // 用户可以借admin来创建package
+    //
+    pub resource interface AdminPublic{
+      pub fun createPackage(name: String, metadata: {String: String}, totalNumber: UInt32)
+    }
+
     // 标准接口，用于初始化存储空间来接受NFT资源
     pub fun createEmptyCollection(): @NonFungibleToken.Collection {
         post {
@@ -256,7 +264,7 @@ pub contract FanNFT: NonFungibleToken {
 
     // Admin用于倒计时完成时mint礼物，存储在账户中等用户claim。
     //
-    pub resource Admin{
+    pub resource Admin: AdminPublic{
       pub fun borrowPackage(packageID: UInt32): &FanNFT.Package {
         pre {
           FanNFT.packages[packageID] != nil: "Cannot borrow Package: The Package doesn't exist"
@@ -270,22 +278,27 @@ pub contract FanNFT: NonFungibleToken {
       }
     }
 
+    pub fun getAllPackages():[FanNFT.PackageData]{
+      log(FanNFT.packageDatas.values)
+      return FanNFT.packageDatas.values
+    }
+
     init() {
       self.totalSupply = 0
       self.nextPackageID = 0
       self.nextGiftID = 0
       self.packageDatas = {}
       self.packages <- {}
-      self.PackageStoragePath = /storage/FanNFTPackageCollection
-      self.PackagePublicPath = /public/FanNFTPackageCollection
+      self.GiftStoragePath = /storage/FanNFTGiftCollection
+      self.GiftPublicPath = /public/FanNFTGiftCollection
       self.AdminStoragePath = /storage/FanNFTAdmin
+      self.AdminPublicPath = /public/FanNFTAdmin
 
-
-      self.account.save<@Collection>(<- create Collection(), to: self.PackageStoragePath)
-
-      self.account.link<&{PackageCollectionPublic}>(self.PackagePublicPath, target: self.PackageStoragePath)
+      self.account.save<@Collection>(<- create Collection(), to: self.GiftStoragePath)
+      self.account.link<&{GiftCollectionPublic}>(self.GiftPublicPath, target: self.GiftStoragePath)
 
       self.account.save<@Admin>(<- create Admin(), to: self.AdminStoragePath)
+      self.account.link<&{AdminPublic}>(self.AdminPublicPath, target: self.AdminStoragePath)
 
       emit ContractInitialized()
     }

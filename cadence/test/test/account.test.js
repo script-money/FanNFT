@@ -19,6 +19,7 @@ init(basePath, port);
 
 describe("FanNFT", () => {
   let packageID
+  const ACTUALNUMBER = 20
 
   it("fund account FLOW balance", async () => {
     const newAccountAddress = await getAccountAddress("Admin");
@@ -90,7 +91,6 @@ describe("FanNFT", () => {
   })
 
   it("Admin can modify package's actualTotalNumber", async () => {
-    const ACTUALNUMBER = 20
     const adminAddress = await getAccountAddress("Admin");
     const transCode = await getTransactionCode(
       {
@@ -122,4 +122,23 @@ describe("FanNFT", () => {
     expect(result.actualTotalNumber).toBe(ACTUALNUMBER)
   })
 
+  it("Admin can mint NFT according actualTotalNumber", async () => {
+    const adminAddress = await getAccountAddress("Admin");
+    const transCode = await getTransactionCode(
+      {
+        name: 'admin/batch_mint_gift',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args1 = [
+      [0, UInt32], // packageID to mint
+    ];
+    const signers = [adminAddress]
+    const tx = await sendTransaction({ code: transCode, args: args1, signers: signers })
+
+    expect(tx.errorMessage).toBe("");
+    expect(tx.status).toBe(4);
+    expect(tx.events[0].type).toBe(`A.${adminAddress.substr(2)}.FanNFT.NewGiftsMint`);
+    expect(tx.events[0].data).toMatchObject({ "packageID": 0, "totalNumber": 20 });
+  })
 });

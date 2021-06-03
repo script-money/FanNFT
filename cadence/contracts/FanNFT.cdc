@@ -20,13 +20,13 @@ pub contract FanNFT: NonFungibleToken {
 
     pub event GiftDestroyed(id: UInt64)
 
-    pub event GiftMinted(giftID: UInt64, packageID: UInt32, serialNumber: UInt32)
-
     pub event Withdraw(id: UInt64, from: Address?)
 
     pub event Deposit(id: UInt64, to: Address?)
 
     pub event ActualTotalNumberChange(packageID:UInt32, newNumber: UInt64)
+
+    pub event NewGiftsMint(packageID:UInt32, totalNumber:UInt64)
 
     pub let GiftStoragePath: StoragePath
 
@@ -93,7 +93,7 @@ pub contract FanNFT: NonFungibleToken {
 
       pub fun setActualTotalNumber(number: UInt64){
         pre {
-          self.actualTotalNumber == (0 as UInt64): "actualTotalNumber should be empty"
+          self.actualTotalNumber == (0 as UInt64): "self.actualTotalNumber should be empty"
         }
         self.actualTotalNumber = number
 
@@ -105,7 +105,7 @@ pub contract FanNFT: NonFungibleToken {
         emit ActualTotalNumberChange(packageID: self.packageID, newNumber: number)
       }
     
-      pub fun mintGift(giftID: UInt64): @NFT{
+      pub fun mintGift(): @NFT{
         
         let newMoment: @NFT <- create NFT(
           packageID: self.packageID,
@@ -116,16 +116,18 @@ pub contract FanNFT: NonFungibleToken {
         return <-newMoment                            
       }
 
-      pub fun batchMintGift(packageID: UInt32, quantity: UInt64): @Collection{
+      pub fun batchMintGift(packageID: UInt32){
+        pre{
+          self.actualTotalNumber != (0 as UInt64): "actualTotalNumber should not be 0"
+        }
         let newCollection <- create Collection()
-
-        var i: UInt64 = 0
-        while i < quantity {
-            newCollection.deposit(token: <-self.mintGift(giftID: i))
+        var i: UInt64 = 1
+        while i <= self.actualTotalNumber {
+            newCollection.deposit(token: <-self.mintGift())
             i = i + (1 as UInt64)
         }
-        self.setActualTotalNumber(number: quantity)
-        return <-newCollection
+        FanNFT.account.save<@Collection>(<-newCollection, to: FanNFT.GiftStoragePath)
+        emit NewGiftsMint(packageID: self.packageID, totalNumber: self.actualTotalNumber)
       }
     }
 
@@ -152,7 +154,6 @@ pub contract FanNFT: NonFungibleToken {
           FanNFT.totalSupply = FanNFT.totalSupply + (1 as UInt64)
           self.id = FanNFT.totalSupply
           self.data = GiftData(packageID: packageID, serialNumber: serialNumber)
-          emit GiftMinted(giftID:self.id ,packageID: packageID, serialNumber:self.data.serialNumber)
         }
 
         destroy() {
@@ -309,9 +310,6 @@ pub contract FanNFT: NonFungibleToken {
       self.GiftPublicPath = /public/FanNFTGiftCollection
       self.AdminStoragePath = /storage/FanNFTAdmin
       self.AdminPublicPath = /public/FanNFTAdmin
-
-      self.account.save<@Collection>(<- create Collection(), to: self.GiftStoragePath)
-      self.account.link<&{GiftCollectionPublic}>(self.GiftPublicPath, target: self.GiftStoragePath)
 
       self.account.save<@Admin>(<- create Admin(), to: self.AdminStoragePath)
       self.account.link<&{AdminPublic}>(self.AdminPublicPath, target: self.AdminStoragePath)

@@ -11,7 +11,7 @@ import {
   getScriptCode,
   executeScript
 } from "flow-js-testing";
-import { UInt32, UInt64, String, Dictionary, Address } from "@onflow/types";
+import { UInt32, UInt64, String, Dictionary, Address, Array } from "@onflow/types";
 
 const basePath = path.resolve(__dirname, "../../../cadence");
 const port = 8080;
@@ -106,16 +106,16 @@ describe("FanNFT", () => {
     expect(tx.errorMessage).toBe("");
     expect(tx.status).toBe(4);
 
-    const getPackageByIDScript = await getScriptCode(
+    const getPackageDataByIDScript = await getScriptCode(
       {
-        name: 'get_package_by_id',
+        name: 'get_package_data_by_id',
         addressMap: { FanNFT: adminAddress }
       }
     )
     const args2 = [
       [0, UInt32]
     ]
-    const result = await executeScript({ code: getPackageByIDScript, args: args2 })
+    const result = await executeScript({ code: getPackageDataByIDScript, args: args2 })
     expect(tx.errorMessage).toBe("");
     expect(result.packageID).toBe(0);
     expect(result.actualTotalNumber).toBe(ACTUALNUMBER)
@@ -185,4 +185,36 @@ describe("FanNFT", () => {
     expect(result).not.toBe(null)
   })
 
+  it("Admin can add Address array have right to claim", async () => {
+    const adminAddress = await getAccountAddress("Admin");
+    const fanAddress = await getAccountAddress("Fan");
+    const fanAddress1 = await getAccountAddress("Fan1");
+    const fanAddress2 = await getAccountAddress("Fan2");
+    const transCode = await getTransactionCode(
+      {
+        name: 'admin/add_claimable_addresses',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args1 = [
+      [[fanAddress, fanAddress1, fanAddress2], Array(Address)],
+      [packageID, UInt32]
+    ];
+    const signers = [adminAddress]
+    const tx = await sendTransaction({ code: transCode, args: args1, signers: signers })
+    expect(tx.errorMessage).toBe("");
+    expect(tx.status).toBe(4);
+
+    const getPackageDataByIdScript = await getScriptCode(
+      {
+        name: 'get_package_data_by_id',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args2 = [
+      [packageID, UInt32]
+    ]
+    const result = await executeScript({ code: getPackageDataByIdScript, args: args2 })
+    expect(result.claimableAddresses.length).toBe(3)
+  })
 });

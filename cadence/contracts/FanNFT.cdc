@@ -44,6 +44,8 @@ pub contract FanNFT: NonFungibleToken {
         pub let metadata: {String:String}    
         pub let totalNumber: UInt32
         pub(set) var actualTotalNumber: UInt64
+        pub(set) var claimableAddresses: [Address]
+        pub let actualClaimedAddress: [Address]
         pub var locked: Bool
 
         init(name: String, metadata:{String:String}, totalNumber: UInt32) {
@@ -56,7 +58,8 @@ pub contract FanNFT: NonFungibleToken {
             self.totalNumber = totalNumber
             self.actualTotalNumber = 0
             self.locked = false
-
+            self.claimableAddresses = []
+            self.actualClaimedAddress = []
             FanNFT.nextPackageID = FanNFT.nextPackageID + (1 as UInt32)
 
             emit PackageCreated(packageID: self.packageID)
@@ -69,7 +72,7 @@ pub contract FanNFT: NonFungibleToken {
       pub var packageID: UInt32
       pub var planTotalNumber: UInt32
       pub var actualTotalNumber: UInt64
-
+      pub var claimableAdresses: [Address]
       pub var numberGiftMinted: UInt32
 
       pub var locked: Bool
@@ -80,7 +83,7 @@ pub contract FanNFT: NonFungibleToken {
         self.actualTotalNumber = 0
         self.numberGiftMinted = 0
         self.locked = false
-
+        self.claimableAdresses = []
         FanNFT.packageDatas[self.packageID] = PackageData(name: name, metadata:metadata, totalNumber: totalNumber)
       }
 
@@ -103,6 +106,15 @@ pub contract FanNFT: NonFungibleToken {
         FanNFT.packageDatas[self.packageID] = packageDataToModify
 
         emit ActualTotalNumberChange(packageID: self.packageID, newNumber: number)
+      }
+
+      pub fun addClaimableAddresses(addressArray:[Address]){
+        self.claimableAdresses.appendAll(addressArray)
+
+        // 需要修改FanNFT.packageDatas的值
+        let packageDataToModify = FanNFT.packageDatas[self.packageID]!
+        packageDataToModify.claimableAddresses = self.claimableAdresses
+        FanNFT.packageDatas[self.packageID] = packageDataToModify
       }
     
       pub fun mintGift(): @NFT{
@@ -292,7 +304,7 @@ pub contract FanNFT: NonFungibleToken {
       return FanNFT.packageDatas.values
     }
 
-    pub fun getPackageByID(packageID:UInt32): FanNFT.PackageData? {
+    pub fun getPackageDataByID(packageID:UInt32): FanNFT.PackageData? {
       if let packageData = FanNFT.packageDatas[packageID]{
         return packageData
       }else{

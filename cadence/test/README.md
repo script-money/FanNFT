@@ -16,4 +16,7 @@ creater 3 role, Admin/Giver/Fans。
 4. Admin can mint NFT according actualTotalNumber
 5. Fans can't borrow collection if not setup account
 6. Fans can init FanNFT vault
-7. Fans can claim NFT
+7. Admin can add Address array have right to claim
+<!-- 8. User can check Address array can claim by packageID
+9. Fans can claim NFT
+10. User can check Address array actually claimed by packageID -->

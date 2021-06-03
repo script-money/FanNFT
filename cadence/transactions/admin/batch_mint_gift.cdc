@@ -1,4 +1,4 @@
-import FanNFT from 0xf8d6e0586b0a20c7
+import FanNFT from "../../contracts/FanNFT.cdc"
 
 transaction(packageID: UInt32, quantity: UInt64) {
 
@@ -8,7 +8,7 @@ transaction(packageID: UInt32, quantity: UInt64) {
     prepare(acct: AuthAccount) {
 
         // borrow a reference to the Admin resource in storage
-        self.adminRef = acct.borrow<&FanNFT.Admin>(from: /storage/FanNFTAdmin)!
+        self.adminRef = acct.borrow<&FanNFT.Admin>(from: /storage/FanNFTAdmin)
     }
 
     execute {

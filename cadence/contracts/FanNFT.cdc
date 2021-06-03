@@ -26,6 +26,8 @@ pub contract FanNFT: NonFungibleToken {
 
     pub event Deposit(id: UInt64, to: Address?)
 
+    pub event ActualTotalNumberChange(packageID:UInt32, newNumber: UInt64)
+
     pub let GiftStoragePath: StoragePath
 
     pub let GiftPublicPath: PublicPath
@@ -41,7 +43,7 @@ pub contract FanNFT: NonFungibleToken {
         pub let packageID: UInt32
         pub let metadata: {String:String}    
         pub let totalNumber: UInt32
-        pub var actualTotalNumber: UInt32
+        pub(set) var actualTotalNumber: UInt64
         pub var locked: Bool
 
         init(name: String, metadata:{String:String}, totalNumber: UInt32) {
@@ -94,6 +96,13 @@ pub contract FanNFT: NonFungibleToken {
           self.actualTotalNumber == (0 as UInt64): "actualTotalNumber should be empty"
         }
         self.actualTotalNumber = number
+
+        // 需要修改FanNFT.packageDatas的值
+        let packageDataToModify = FanNFT.packageDatas[self.packageID]!
+        packageDataToModify.actualTotalNumber = self.actualTotalNumber
+        FanNFT.packageDatas[self.packageID] = packageDataToModify
+
+        emit ActualTotalNumberChange(packageID: self.packageID, newNumber: number)
       }
     
       pub fun mintGift(giftID: UInt64): @NFT{
@@ -279,8 +288,15 @@ pub contract FanNFT: NonFungibleToken {
     }
 
     pub fun getAllPackages():[FanNFT.PackageData]{
-      log(FanNFT.packageDatas.values)
       return FanNFT.packageDatas.values
+    }
+
+    pub fun getPackageByID(packageID:UInt32): FanNFT.PackageData? {
+      if let packageData = FanNFT.packageDatas[packageID]{
+        return packageData
+      }else{
+        return nil
+      }
     }
 
     init() {

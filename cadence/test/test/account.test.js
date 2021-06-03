@@ -22,15 +22,14 @@ describe("FanNFT", () => {
   const ACTUALNUMBER = 20
 
   it("fund account FLOW balance", async () => {
-    const newAccountAddress = await getAccountAddress("Admin");
-    await mintFlow(newAccountAddress, "10.572");
-    const newBalance = await getFlowBalance(newAccountAddress);
+    const adminAddress = await getAccountAddress("Admin");
+    await mintFlow(adminAddress, "10.572");
+    const newBalance = await getFlowBalance(adminAddress);
     expect(newBalance).not.toBe(0)
   });
 
   it('Admin can deploy two contract', async () => {
     const adminAddress = await getAccountAddress("Admin");
-
     try {
       await deployContractByName({ to: adminAddress, name: "NonFungibleToken" });
     } catch (e) {
@@ -141,4 +140,49 @@ describe("FanNFT", () => {
     expect(tx.events[0].type).toBe(`A.${adminAddress.substr(2)}.FanNFT.NewGiftsMint`);
     expect(tx.events[0].data).toMatchObject({ "packageID": 0, "totalNumber": 20 });
   })
+
+  it("Fans can't borrow collection if not setup account", async () => {
+    const adminAddress = await getAccountAddress("Admin");
+    const fanAddress = await getAccountAddress("Fan");
+    const getAccountStorageScript = await getScriptCode(
+      {
+        name: 'get_account_storage',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args1 = [
+      [fanAddress, Address]
+    ]
+    const result = await executeScript({ code: getAccountStorageScript, args: args1 })
+    expect(result).toBe(null)
+  })
+
+  it("Fans can init FanNFT vault", async () => {
+    const adminAddress = await getAccountAddress("Admin");
+    const fanAddress = await getAccountAddress("Fan");
+    const transCode = await getTransactionCode(
+      {
+        name: 'fans/setup_account',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args1 = [[]];
+    const signers = [fanAddress]
+    const tx = await sendTransaction({ code: transCode, args: args1, signers: signers })
+    expect(tx.errorMessage).toBe("");
+    expect(tx.status).toBe(4);
+
+    const getAccountStorageScript = await getScriptCode(
+      {
+        name: 'get_account_storage',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args2 = [
+      [fanAddress, Address]
+    ]
+    const result = await executeScript({ code: getAccountStorageScript, args: args2 })
+    expect(result).not.toBe(null)
+  })
+
 });

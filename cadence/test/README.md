@@ -14,5 +14,6 @@ creater 3 role, Admin/Giver/Fans。
 2. Giver can create new package, storage to admin and can read
 3. Admin can modify package's actualTotalNumber
 4. Admin can mint NFT according actualTotalNumber
-5. Fans can init FanNFT vault
-6. Fans can claim NFT
+5. Fans can't borrow collection if not setup account
+6. Fans can init FanNFT vault
+7. Fans can claim NFT

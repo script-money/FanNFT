@@ -1,5 +1,7 @@
 import FanNFT from "../../contracts/FanNFT.cdc"
 
+// 该transition可以向package传入符合条件的fans的地址列表。
+
 transaction(addresses: [Address], packageID: UInt32) {
   let adminRef: &FanNFT.Admin
 

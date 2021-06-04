@@ -24,9 +24,7 @@ pub contract FanNFT: NonFungibleToken {
 
     pub event Deposit(id: UInt64, to: Address?)
 
-    pub event ActualTotalNumberChange(packageID:UInt32, newNumber: UInt64)
-
-    pub event NewGiftsMint(packageID:UInt32, totalNumber:UInt64)
+    pub event NewGiftsMinted(packageID: UInt32, amount: UInt32)
 
     pub let GiftStoragePath: StoragePath
 
@@ -36,17 +34,15 @@ pub contract FanNFT: NonFungibleToken {
 
     pub let AdminPublicPath: PublicPath
 
-    // 用于前端的礼包列表信息
+    // 用于前端的礼包列表信息，可以发script直接获取
     //
     pub struct PackageData {
         pub let name: String
         pub let packageID: UInt32
         pub let metadata: {String:String}    
         pub let totalNumber: UInt32
-        pub(set) var actualTotalNumber: UInt64
         pub(set) var claimableAddresses: [Address]
-        pub let actualClaimedAddress: [Address]
-        pub var locked: Bool
+        pub(set) var locked: Bool
 
         init(name: String, metadata:{String:String}, totalNumber: UInt32) {
             pre {
@@ -56,10 +52,8 @@ pub contract FanNFT: NonFungibleToken {
             self.packageID = FanNFT.nextPackageID
             self.metadata = metadata
             self.totalNumber = totalNumber
-            self.actualTotalNumber = 0
             self.locked = false
             self.claimableAddresses = []
-            self.actualClaimedAddress = []
             FanNFT.nextPackageID = FanNFT.nextPackageID + (1 as UInt32)
 
             emit PackageCreated(packageID: self.packageID)
@@ -71,7 +65,6 @@ pub contract FanNFT: NonFungibleToken {
     pub resource Package {
       pub var packageID: UInt32
       pub var planTotalNumber: UInt32
-      pub var actualTotalNumber: UInt64
       pub var claimableAdresses: [Address]
       pub var numberGiftMinted: UInt32
 
@@ -80,7 +73,6 @@ pub contract FanNFT: NonFungibleToken {
       init(name: String, metadata:{String:String}, totalNumber: UInt32) {
         self.packageID = FanNFT.nextPackageID
         self.planTotalNumber = totalNumber
-        self.actualTotalNumber = 0
         self.numberGiftMinted = 0
         self.locked = false
         self.claimableAdresses = []
@@ -90,35 +82,21 @@ pub contract FanNFT: NonFungibleToken {
       access(self) fun lock(){
         if !self.locked{
           self.locked = true
+          let packageDataToModify = FanNFT.packageDatas[self.packageID]!
+          packageDataToModify.locked = self.locked
           emit PackageLocked(packageID:self.packageID)
         }
-      }
-
-      pub fun setActualTotalNumber(number: UInt64){
-        pre {
-          self.actualTotalNumber == (0 as UInt64): "self.actualTotalNumber should be empty"
-        }
-        self.actualTotalNumber = number
-
-        // 需要修改FanNFT.packageDatas的值
-        let packageDataToModify = FanNFT.packageDatas[self.packageID]!
-        packageDataToModify.actualTotalNumber = self.actualTotalNumber
-        FanNFT.packageDatas[self.packageID] = packageDataToModify
-
-        emit ActualTotalNumberChange(packageID: self.packageID, newNumber: number)
       }
 
       pub fun addClaimableAddresses(addressArray:[Address]){
         self.claimableAdresses.appendAll(addressArray)
 
-        // 需要修改FanNFT.packageDatas的值
         let packageDataToModify = FanNFT.packageDatas[self.packageID]!
         packageDataToModify.claimableAddresses = self.claimableAdresses
         FanNFT.packageDatas[self.packageID] = packageDataToModify
       }
     
       pub fun mintGift(): @NFT{
-        
         let newMoment: @NFT <- create NFT(
           packageID: self.packageID,
           serialNumber: self.numberGiftMinted + (1 as UInt32),
@@ -128,18 +106,26 @@ pub contract FanNFT: NonFungibleToken {
         return <-newMoment                            
       }
 
-      pub fun batchMintGift(packageID: UInt32){
+      pub fun batchMintGift(packageID: UInt32): @Collection{
         pre{
-          self.actualTotalNumber != (0 as UInt64): "actualTotalNumber should not be 0"
+          self.locked == false: "package is locked"
+        }
+        var shouldMintAmount = UInt32(self.claimableAdresses.length)
+        if shouldMintAmount > self.planTotalNumber{
+          // 只挖planTotalNumber长度并分发给前N个地址
+          shouldMintAmount = self.planTotalNumber
         }
         let newCollection <- create Collection()
         var i: UInt64 = 1
-        while i <= self.actualTotalNumber {
+        while i <= UInt64(shouldMintAmount) {
             newCollection.deposit(token: <-self.mintGift())
             i = i + (1 as UInt64)
         }
-        FanNFT.account.save<@Collection>(<-newCollection, to: FanNFT.GiftStoragePath)
-        emit NewGiftsMint(packageID: self.packageID, totalNumber: self.actualTotalNumber)
+        // gift以Collection的形式，存在合约账户的GiftStoragePath下
+
+        emit NewGiftsMinted(packageID:self.packageID, amount:shouldMintAmount)
+        self.lock()
+        return <-newCollection
       }
     }
 
@@ -297,6 +283,10 @@ pub contract FanNFT: NonFungibleToken {
       pub fun createPackage(name: String, metadata: {String: String}, totalNumber: UInt32){
         var newPackage <- create Package(name:name, metadata:metadata, totalNumber:totalNumber)
         FanNFT.packages[newPackage.packageID] <-! newPackage
+      }
+
+      pub fun saveEmptyCollection(emptyCollection: @Collection){
+        FanNFT.account.save<@Collection>(<-emptyCollection, to: FanNFT.GiftStoragePath)
       }
     }
 

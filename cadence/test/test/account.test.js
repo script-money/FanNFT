@@ -21,14 +21,20 @@ describe("FanNFT", () => {
   let packageID
   const ACTUALNUMBER = 20
 
-  it("fund account FLOW balance", async () => {
+  it("0. fund account FLOW balance", async () => {
     const adminAddress = await getAccountAddress("Admin");
+    const fanAddress = await getAccountAddress("Fan");
+    const fanAddress1 = await getAccountAddress("Fan1");
+    const fanAddress2 = await getAccountAddress("Fan2");
     await mintFlow(adminAddress, "10.572");
+    await mintFlow(fanAddress, "0.01");
+    await mintFlow(fanAddress1, "0.01");
+    await mintFlow(fanAddress2, "0.01");
     const newBalance = await getFlowBalance(adminAddress);
     expect(newBalance).not.toBe(0)
   });
 
-  it('Admin can deploy two contract', async () => {
+  it('1. Admin can deploy two contract', async () => {
     const adminAddress = await getAccountAddress("Admin");
     try {
       await deployContractByName({ to: adminAddress, name: "NonFungibleToken" });
@@ -48,7 +54,7 @@ describe("FanNFT", () => {
     expect(deployTx.status).toBe(4); // 4是正常
   })
 
-  it("Giver can create new package, storage to admin and can read", async () => {
+  it("2. Giver can create new package, storage to admin and can read", async () => {
     const userAddress = await getAccountAddress("User");
     const adminAddress = await getAccountAddress("Admin");
     const transCode = await getTransactionCode(
@@ -85,63 +91,10 @@ describe("FanNFT", () => {
     packageID = result[0].packageID
     expect(packageID).toBe(0);
     expect(result[0].totalNumber).toBe(10)
-    expect(result[0].actualTotalNumber).toBe(0)
     expect(result[0].locked).toBe(false)
   })
 
-  it("Admin can modify package's actualTotalNumber", async () => {
-    const adminAddress = await getAccountAddress("Admin");
-    const transCode = await getTransactionCode(
-      {
-        name: 'admin/change_actual_total_number',
-        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
-      }
-    )
-    const args1 = [
-      [0, UInt32], // packageID to modify
-      [ACTUALNUMBER, UInt64] // actual number
-    ];
-    const signers = [adminAddress]
-    const tx = await sendTransaction({ code: transCode, args: args1, signers: signers })
-    expect(tx.errorMessage).toBe("");
-    expect(tx.status).toBe(4);
-
-    const getPackageDataByIDScript = await getScriptCode(
-      {
-        name: 'get_package_data_by_id',
-        addressMap: { FanNFT: adminAddress }
-      }
-    )
-    const args2 = [
-      [0, UInt32]
-    ]
-    const result = await executeScript({ code: getPackageDataByIDScript, args: args2 })
-    expect(tx.errorMessage).toBe("");
-    expect(result.packageID).toBe(0);
-    expect(result.actualTotalNumber).toBe(ACTUALNUMBER)
-  })
-
-  it("Admin can mint NFT according actualTotalNumber", async () => {
-    const adminAddress = await getAccountAddress("Admin");
-    const transCode = await getTransactionCode(
-      {
-        name: 'admin/batch_mint_gift',
-        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
-      }
-    )
-    const args1 = [
-      [0, UInt32], // packageID to mint
-    ];
-    const signers = [adminAddress]
-    const tx = await sendTransaction({ code: transCode, args: args1, signers: signers })
-
-    expect(tx.errorMessage).toBe("");
-    expect(tx.status).toBe(4);
-    expect(tx.events[0].type).toBe(`A.${adminAddress.substr(2)}.FanNFT.NewGiftsMint`);
-    expect(tx.events[0].data).toMatchObject({ "packageID": 0, "totalNumber": 20 });
-  })
-
-  it("Fans can't borrow collection if not setup account", async () => {
+  it("3. Fans can't borrow collection if not setup account", async () => {
     const adminAddress = await getAccountAddress("Admin");
     const fanAddress = await getAccountAddress("Fan");
     const getAccountStorageScript = await getScriptCode(
@@ -157,9 +110,11 @@ describe("FanNFT", () => {
     expect(result).toBe(null)
   })
 
-  it("Fans can init FanNFT vault", async () => {
+  it("4. Fans can init FanNFT vault", async () => {
     const adminAddress = await getAccountAddress("Admin");
     const fanAddress = await getAccountAddress("Fan");
+    const fanAddress1 = await getAccountAddress("Fan1");
+    const fanAddress2 = await getAccountAddress("Fan2");
     const transCode = await getTransactionCode(
       {
         name: 'fans/setup_account',
@@ -183,9 +138,14 @@ describe("FanNFT", () => {
     ]
     const result = await executeScript({ code: getAccountStorageScript, args: args2 })
     expect(result).not.toBe(null)
+
+    const signers1 = [fanAddress1]
+    await sendTransaction({ code: transCode, args: args1, signers: signers1 })
+    const signers2 = [fanAddress2]
+    await sendTransaction({ code: transCode, args: args1, signers: signers2 })
   })
 
-  it("Admin can add Address array have right to claim", async () => {
+  it("5. Admin can add Address array have right to claim", async () => {
     const adminAddress = await getAccountAddress("Admin");
     const fanAddress = await getAccountAddress("Fan");
     const fanAddress1 = await getAccountAddress("Fan1");
@@ -216,5 +176,36 @@ describe("FanNFT", () => {
     ]
     const result = await executeScript({ code: getPackageDataByIdScript, args: args2 })
     expect(result.claimableAddresses.length).toBe(3)
+  })
+
+  it("6. Admin can mint NFT according claimable addresses and send to fans", async () => {
+    const adminAddress = await getAccountAddress("Admin");
+    const transCode = await getTransactionCode(
+      {
+        name: 'admin/batch_mint_gift',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args1 = [
+      [0, UInt32], // packageID to mint
+    ];
+    const signers = [adminAddress]
+    const tx = await sendTransaction({ code: transCode, args: args1, signers: signers })
+    expect(tx.errorMessage).toBe("");
+    expect(tx.status).toBe(4);
+
+    // select on fans check
+    const fanAddress2 = await getAccountAddress("Fan2");
+    const getPackageDataByIdScript = await getScriptCode(
+      {
+        name: 'get_all_gift_ids_by_address',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args2 = [
+      [fanAddress2, Address]
+    ]
+    const result = await executeScript({ code: getPackageDataByIdScript, args: args2 })
+    expect(result).toMatchObject([3]);
   })
 });

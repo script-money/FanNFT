@@ -140,11 +140,14 @@ pub contract FanNFT: NonFungibleToken {
     // 用于前端显示礼物的详细信息
     //
     pub struct GiftData {
+        pub let id: UInt64
+
         pub let packageID: UInt32
 
         pub let serialNumber: UInt32
 
-        init(packageID: UInt32, serialNumber: UInt32) {
+        init(id: UInt64, packageID: UInt32, serialNumber: UInt32) {
+            self.id = id
             self.packageID = packageID
             self.serialNumber = serialNumber
         }
@@ -159,7 +162,7 @@ pub contract FanNFT: NonFungibleToken {
         init(packageID: UInt32, serialNumber: UInt32){
           FanNFT.totalSupply = FanNFT.totalSupply + (1 as UInt64)
           self.id = FanNFT.totalSupply
-          self.data = GiftData(packageID: packageID, serialNumber: serialNumber)
+          self.data = GiftData(id: self.id, packageID: packageID, serialNumber: serialNumber)
         }
 
         destroy() {

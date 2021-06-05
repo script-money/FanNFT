@@ -210,7 +210,6 @@ describe("FanNFT", () => {
   })
 
   it("7. Fans can get all gift data his/her recieved", async () => {
-    // 首先要获取所有packageData，然后获取Gift的ID，最后组成结构化的格式返回给前端
     const adminAddress = await getAccountAddress("Admin");
     const fanAddress2 = await getAccountAddress("Fan2");
     const getPackageDataByIdScript = await getScriptCode(
@@ -235,8 +234,19 @@ describe("FanNFT", () => {
       [fanAddress2, Address]
     ]
     const ownIDs = await executeScript({ code: getAllGiftIdsScript, args: args2 })
-    console.log('ownIDs', ownIDs);
 
+    const getGiftDataByIdScript = await getScriptCode(
+      {
+        name: 'get_gift_data_by_id',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
 
+    const args3 = [
+      [fanAddress2, Address],
+      [ownIDs, Array(UInt64)]
+    ]
+    const result = await executeScript({ code: getGiftDataByIdScript, args: args3 })
+    expect(result[0]).toMatchObject({ id: 3, packageID: 0, serialNumber: 3 })
   })
 });

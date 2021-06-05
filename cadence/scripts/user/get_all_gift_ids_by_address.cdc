@@ -1,5 +1,5 @@
-import FanNFT from "../contracts/FanNFT.cdc"
-import NonFungibleToken from "../contracts/NonFungibleToken.cdc"
+import FanNFT from "../../contracts/FanNFT.cdc"
+import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 
 // 用于获取账户下的giftID
 

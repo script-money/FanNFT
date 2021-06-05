@@ -82,7 +82,7 @@ describe("FanNFT", () => {
 
     const getPackagesScript = await getScriptCode(
       {
-        name: 'get_all_packages',
+        name: 'user/get_all_packages',
         addressMap: { FanNFT: adminAddress }
       }
     )
@@ -99,7 +99,7 @@ describe("FanNFT", () => {
     const fanAddress = await getAccountAddress("Fan");
     const getAccountStorageScript = await getScriptCode(
       {
-        name: 'get_account_storage',
+        name: 'user/get_account_storage',
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )
@@ -129,7 +129,7 @@ describe("FanNFT", () => {
 
     const getAccountStorageScript = await getScriptCode(
       {
-        name: 'get_account_storage',
+        name: 'user/get_account_storage',
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )
@@ -167,7 +167,7 @@ describe("FanNFT", () => {
 
     const getPackageDataByIdScript = await getScriptCode(
       {
-        name: 'get_package_data_by_id',
+        name: 'user/get_package_data_by_id',
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )
@@ -198,7 +198,7 @@ describe("FanNFT", () => {
     const fanAddress2 = await getAccountAddress("Fan2");
     const getPackageDataByIdScript = await getScriptCode(
       {
-        name: 'get_all_gift_ids_by_address',
+        name: 'user/get_all_gift_ids_by_address',
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )
@@ -214,7 +214,7 @@ describe("FanNFT", () => {
     const fanAddress2 = await getAccountAddress("Fan2");
     const getPackageDataByIdScript = await getScriptCode(
       {
-        name: 'get_all_packages',
+        name: 'user/get_all_packages',
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )
@@ -226,7 +226,7 @@ describe("FanNFT", () => {
 
     const getAllGiftIdsScript = await getScriptCode(
       {
-        name: 'get_all_gift_ids_by_address',
+        name: 'user/get_all_gift_ids_by_address',
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )
@@ -237,7 +237,7 @@ describe("FanNFT", () => {
 
     const getGiftDataByIdScript = await getScriptCode(
       {
-        name: 'get_gift_data_by_id',
+        name: 'user/get_gift_data_by_id',
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )

@@ -1,5 +1,5 @@
-import FanNFT from "../contracts/FanNFT.cdc"
-import NonFungibleToken from "../contracts/NonFungibleToken.cdc"
+import FanNFT from "../../contracts/FanNFT.cdc"
+import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 
 // 返回用户持有的giftNFT信息
 

@@ -1,4 +1,4 @@
-import FanNFT from "../contracts/FanNFT.cdc"
+import FanNFT from "../../contracts/FanNFT.cdc"
 
 // 用于根据ID获取package的数据
 

@@ -14,6 +14,6 @@ creater 3 role, Admin/Giver/Fans。
 2. Giver can create new package, storage to admin and can read
 3. Fans can't borrow collection if not setup account
 4. Fans can init FanNFT vault
-5. Admin can add Address array have right to claim
-6. Admin can mint NFT according claimable addresses and send to fans
-<!-- 7. Fans can get all gift data his/her recieved -->
+5. Admin can add Address array have right to reward
+6. Admin can mint NFT according reward addresses and send to fans
+7. Fans can get all gift data his/her recieved

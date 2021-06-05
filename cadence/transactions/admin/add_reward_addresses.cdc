@@ -12,6 +12,6 @@ transaction(addresses: [Address], packageID: UInt32) {
 
   execute{
     let packageRef = self.adminRef.borrowPackage(packageID: packageID)
-    packageRef.addClaimableAddresses(addressArray: addresses)
+    packageRef.addRewardAddresses(addressArray: addresses)
   }
 }

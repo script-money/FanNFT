@@ -41,8 +41,9 @@ pub contract FanNFT: NonFungibleToken {
         pub let packageID: UInt32
         pub let metadata: {String:String}    
         pub let totalNumber: UInt32
-        pub(set) var claimableAddresses: [Address]
+        pub(set) var rewardAddresses: [Address]
         pub(set) var locked: Bool
+        pub(set) var giftIDs: [UInt64]
 
         init(name: String, metadata:{String:String}, totalNumber: UInt32) {
             pre {
@@ -53,7 +54,8 @@ pub contract FanNFT: NonFungibleToken {
             self.metadata = metadata
             self.totalNumber = totalNumber
             self.locked = false
-            self.claimableAddresses = []
+            self.rewardAddresses = []
+            self.giftIDs = []
             FanNFT.nextPackageID = FanNFT.nextPackageID + (1 as UInt32)
 
             emit PackageCreated(packageID: self.packageID)
@@ -65,7 +67,7 @@ pub contract FanNFT: NonFungibleToken {
     pub resource Package {
       pub var packageID: UInt32
       pub var planTotalNumber: UInt32
-      pub var claimableAdresses: [Address]
+      pub var rewardAdresses: [Address]
       pub var numberGiftMinted: UInt32
 
       pub var locked: Bool
@@ -75,7 +77,7 @@ pub contract FanNFT: NonFungibleToken {
         self.planTotalNumber = totalNumber
         self.numberGiftMinted = 0
         self.locked = false
-        self.claimableAdresses = []
+        self.rewardAdresses = []
         FanNFT.packageDatas[self.packageID] = PackageData(name: name, metadata:metadata, totalNumber: totalNumber)
       }
 
@@ -84,15 +86,16 @@ pub contract FanNFT: NonFungibleToken {
           self.locked = true
           let packageDataToModify = FanNFT.packageDatas[self.packageID]!
           packageDataToModify.locked = self.locked
+          FanNFT.packageDatas[self.packageID] = packageDataToModify
           emit PackageLocked(packageID:self.packageID)
         }
       }
 
-      pub fun addClaimableAddresses(addressArray:[Address]){
-        self.claimableAdresses.appendAll(addressArray)
+      pub fun addRewardAddresses(addressArray:[Address]){
+        self.rewardAdresses.appendAll(addressArray)
 
         let packageDataToModify = FanNFT.packageDatas[self.packageID]!
-        packageDataToModify.claimableAddresses = self.claimableAdresses
+        packageDataToModify.rewardAddresses = self.rewardAdresses
         FanNFT.packageDatas[self.packageID] = packageDataToModify
       }
     
@@ -102,7 +105,12 @@ pub contract FanNFT: NonFungibleToken {
           serialNumber: self.numberGiftMinted + (1 as UInt32),
         )
 
-        self.numberGiftMinted = self.numberGiftMinted + (1 as UInt32)                           
+        self.numberGiftMinted = self.numberGiftMinted + (1 as UInt32) 
+               
+        let packageDataToModify = FanNFT.packageDatas[self.packageID]!
+        packageDataToModify.giftIDs.append(newMoment.id)
+        FanNFT.packageDatas[self.packageID] = packageDataToModify
+
         return <-newMoment                            
       }
 
@@ -110,7 +118,7 @@ pub contract FanNFT: NonFungibleToken {
         pre{
           self.locked == false: "package is locked"
         }
-        var shouldMintAmount = UInt32(self.claimableAdresses.length)
+        var shouldMintAmount = UInt32(self.rewardAdresses.length)
         if shouldMintAmount > self.planTotalNumber{
           // 只挖planTotalNumber长度并分发给前N个地址
           shouldMintAmount = self.planTotalNumber
@@ -270,7 +278,7 @@ pub contract FanNFT: NonFungibleToken {
         return <-create FanNFT.Collection()
     }
 
-    // Admin用于倒计时完成时mint礼物，存储在账户中等用户claim。
+    // Admin用于倒计时完成时mint礼物，并分发
     //
     pub resource Admin: AdminPublic{
       pub fun borrowPackage(packageID: UInt32): &FanNFT.Package {

@@ -1,8 +1,8 @@
 import FanNFT from "../../contracts/FanNFT.cdc"
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 
-// 该transaction用于礼包倒计时结束，管理员会根据Package的claimableAdresses来mint礼物，
-// 然后deposit到参加claim的账户路径里。空的collection存回admin的storage中
+// 该transaction用于礼包倒计时结束，管理员会根据Package的rewardAdresses来mint礼物，
+// 然后deposit到参加reward的账户路径里。空的collection存回admin的storage中
 
 transaction(packageID: UInt32) {
 
@@ -17,7 +17,7 @@ transaction(packageID: UInt32) {
         let packageRef = self.adminRef.borrowPackage(packageID: packageID)
         let collection <- packageRef.batchMintGift(packageID: packageID)
         let ids = collection.getIDs()
-        let addresses = packageRef.claimableAdresses
+        let addresses = packageRef.rewardAdresses
         for id in ids{             
           let recieverAddress = addresses[id-(1 as UInt64)]      
           let recipient = getAccount(recieverAddress)

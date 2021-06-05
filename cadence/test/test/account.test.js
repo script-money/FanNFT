@@ -145,14 +145,14 @@ describe("FanNFT", () => {
     await sendTransaction({ code: transCode, args: args1, signers: signers2 })
   })
 
-  it("5. Admin can add Address array have right to claim", async () => {
+  it("5. Admin can add Address array have right to reward", async () => {
     const adminAddress = await getAccountAddress("Admin");
     const fanAddress = await getAccountAddress("Fan");
     const fanAddress1 = await getAccountAddress("Fan1");
     const fanAddress2 = await getAccountAddress("Fan2");
     const transCode = await getTransactionCode(
       {
-        name: 'admin/add_claimable_addresses',
+        name: 'admin/add_reward_addresses',
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )
@@ -175,10 +175,10 @@ describe("FanNFT", () => {
       [packageID, UInt32]
     ]
     const result = await executeScript({ code: getPackageDataByIdScript, args: args2 })
-    expect(result.claimableAddresses.length).toBe(3)
+    expect(result.rewardAddresses.length).toBe(3)
   })
 
-  it("6. Admin can mint NFT according claimable addresses and send to fans", async () => {
+  it("6. Admin can mint NFT according reward addresses and send to fans", async () => {
     const adminAddress = await getAccountAddress("Admin");
     const transCode = await getTransactionCode(
       {
@@ -207,5 +207,36 @@ describe("FanNFT", () => {
     ]
     const result = await executeScript({ code: getPackageDataByIdScript, args: args2 })
     expect(result).toMatchObject([3]);
+  })
+
+  it("7. Fans can get all gift data his/her recieved", async () => {
+    // 首先要获取所有packageData，然后获取Gift的ID，最后组成结构化的格式返回给前端
+    const adminAddress = await getAccountAddress("Admin");
+    const fanAddress2 = await getAccountAddress("Fan2");
+    const getPackageDataByIdScript = await getScriptCode(
+      {
+        name: 'get_all_packages',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args1 = [
+      []
+    ]
+    const packageDatas = await executeScript({ code: getPackageDataByIdScript, args: args1 })
+    console.log('packageDatas', packageDatas);
+
+    const getAllGiftIdsScript = await getScriptCode(
+      {
+        name: 'get_all_gift_ids_by_address',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args2 = [
+      [fanAddress2, Address]
+    ]
+    const ownIDs = await executeScript({ code: getAllGiftIdsScript, args: args2 })
+    console.log('ownIDs', ownIDs);
+
+
   })
 });

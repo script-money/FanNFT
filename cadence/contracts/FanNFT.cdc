@@ -1,4 +1,5 @@
 import NonFungibleToken from "./NonFungibleToken.cdc"
+// import NonFungibleToken from 0x631e88ae7f1d7c20 // 0x631e88ae7f1d7c20
 
 pub contract FanNFT: NonFungibleToken {
 
@@ -37,19 +38,14 @@ pub contract FanNFT: NonFungibleToken {
     // 用于前端的礼包列表信息，可以发script直接获取
     //
     pub struct PackageData {
-        pub let name: String
         pub let packageID: UInt32
-        pub let metadata: {String:String}    
+        pub let metadata: String   
         pub let totalNumber: UInt32
         pub(set) var rewardAddresses: [Address]
         pub(set) var locked: Bool
         pub(set) var giftIDs: [UInt64]
 
-        init(name: String, metadata:{String:String}, totalNumber: UInt32) {
-            pre {
-                name.length > 0: "New Package name cannot be empty"
-            }
-            self.name = name
+        init(metadata:String, totalNumber: UInt32) {
             self.packageID = FanNFT.nextPackageID
             self.metadata = metadata
             self.totalNumber = totalNumber
@@ -72,13 +68,13 @@ pub contract FanNFT: NonFungibleToken {
 
       pub var locked: Bool
 
-      init(name: String, metadata:{String:String}, totalNumber: UInt32) {
+      init(metadata:String, totalNumber: UInt32) {
         self.packageID = FanNFT.nextPackageID
         self.planTotalNumber = totalNumber
         self.numberGiftMinted = 0
         self.locked = false
         self.rewardAdresses = []
-        FanNFT.packageDatas[self.packageID] = PackageData(name: name, metadata:metadata, totalNumber: totalNumber)
+        FanNFT.packageDatas[self.packageID] = PackageData(metadata:metadata, totalNumber: totalNumber)
       }
 
       access(self) fun lock(){
@@ -270,7 +266,7 @@ pub contract FanNFT: NonFungibleToken {
     // 用户可以借admin来创建package
     //
     pub resource interface AdminPublic{
-      pub fun createPackage(name: String, metadata: {String: String}, totalNumber: UInt32)
+      pub fun createPackage(metadata: String, totalNumber: UInt32)
     }
 
     // 标准接口，用于初始化存储空间来接受NFT资源
@@ -291,8 +287,8 @@ pub contract FanNFT: NonFungibleToken {
         return &FanNFT.packages[packageID] as &FanNFT.Package 
       }
 
-      pub fun createPackage(name: String, metadata: {String: String}, totalNumber: UInt32){
-        var newPackage <- create Package(name:name, metadata:metadata, totalNumber:totalNumber)
+      pub fun createPackage(metadata: String, totalNumber: UInt32){
+        var newPackage <- create Package(metadata:metadata, totalNumber:totalNumber)
         FanNFT.packages[newPackage.packageID] <-! newPackage
       }
 

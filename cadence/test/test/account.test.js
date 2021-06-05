@@ -11,7 +11,7 @@ import {
   getScriptCode,
   executeScript
 } from "flow-js-testing";
-import { UInt32, UInt64, String, Dictionary, Address, Array } from "@onflow/types";
+import { UInt32, String, Address, Array, UInt64 } from "@onflow/types";
 
 const basePath = path.resolve(__dirname, "../../../cadence");
 const port = 8080;
@@ -63,18 +63,20 @@ describe("FanNFT", () => {
         addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
       }
     )
+
+    const metadata = {
+      "name": "discord gift",
+      "image": "https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg",
+      "content": "discrd logo 🙂 ${ADDRESS}",
+      "deadline": "2021-05-05 12:00:00"
+    }
+
     const args = [
-      ["test package 1", String],
-      [
-        [
-          { key: "description", value: "这是第一个测试包" },
-          { key: "message", value: "Hello" },
-        ],
-        Dictionary({ key: String, value: String })
-      ],
+      [JSON.stringify(metadata), String],
       [10, UInt32],
       [adminAddress, Address]
     ];
+
     const signers = [userAddress]
     const tx = await sendTransaction({ code: transCode, args: args, signers: signers })
     expect(tx.errorMessage).toBe("");
@@ -87,6 +89,7 @@ describe("FanNFT", () => {
       }
     )
     const result = await executeScript({ code: getPackagesScript })
+    console.log('新生成的package:', result);
     expect(tx.errorMessage).toBe("");
     packageID = result[0].packageID
     expect(packageID).toBe(0);
@@ -222,7 +225,6 @@ describe("FanNFT", () => {
       []
     ]
     const packageDatas = await executeScript({ code: getPackageDataByIdScript, args: args1 })
-    console.log('packageDatas', packageDatas);
 
     const getAllGiftIdsScript = await getScriptCode(
       {

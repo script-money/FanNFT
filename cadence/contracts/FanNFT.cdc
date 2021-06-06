@@ -1,5 +1,6 @@
-import NonFungibleToken from "./NonFungibleToken.cdc"
-// import NonFungibleToken from 0x631e88ae7f1d7c20 // 0x631e88ae7f1d7c20
+// import NonFungibleToken from "./NonFungibleToken.cdc"
+import NonFungibleToken from 0xf8d6e0586b0a20c7 // 模拟器
+// import NonFungibleToken from 0x631e88ae7f1d7c20 // 测试网账户
 
 pub contract FanNFT: NonFungibleToken {
 
@@ -272,7 +273,7 @@ pub contract FanNFT: NonFungibleToken {
     // 标准接口，用于初始化存储空间来接受NFT资源
     pub fun createEmptyCollection(): @NonFungibleToken.Collection {
         post {
-            result.getIDs().length == 0: "The created collection must be empty!"
+          result.getIDs().length == 0: "The created collection must be empty!"
         }
         return <-create FanNFT.Collection()
     }

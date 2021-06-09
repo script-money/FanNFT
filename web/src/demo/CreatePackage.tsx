@@ -37,7 +37,8 @@ const CreatePackage = () => {
   const [title, setTitle] = useState('')
   const [totalNumber, setTotalNumber] = useState(0)
   const [content, setContent] = useState('')
-  const [deadline, setDeadline] = useState('')
+  const [keyWord, setKeyWord] = useState('')
+  const [deadline, setDeadline] = useState(Date.now() + 1000 * 3 * 60)
   const [metadata, setMetadata] = useState('')
 
   useEffect(() => {
@@ -45,10 +46,12 @@ const CreatePackage = () => {
       title,
       image: 'https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg',
       content,
+      keyWord,
+      createAt: Date.now(),
       deadline,
     })
     setMetadata(metaString)
-  }, [title, content, deadline])
+  }, [title, content, keyWord, deadline])
 
   const titleHandleChange = (event: any) => {
     setTitle(event.target.value)
@@ -58,6 +61,9 @@ const CreatePackage = () => {
   }
   const contentHandleChange = (event: any) => {
     setContent(event.target.value)
+  }
+  const keyWordHandleChange = (event: any) => {
+    setKeyWord(event.target.value)
   }
   const deadlineHandleChange = (event: any) => {
     setDeadline(event.target.value)
@@ -111,7 +117,8 @@ const CreatePackage = () => {
       <input value={title} onChange={titleHandleChange} placeholder="输入礼包名"></input>
       <input type="number" value={totalNumber} onChange={totalNumberHandleChange} placeholder="礼物总数"></input>
       <input value={content} onChange={contentHandleChange} placeholder="输入转发内容"></input>
-      <input value={deadline} onChange={deadlineHandleChange} placeholder="输入截止日期"></input>
+      <input value={keyWord} onChange={keyWordHandleChange} placeholder="输入关键词"></input>
+      <input type="number" value={deadline} onChange={deadlineHandleChange} placeholder="输入截止日期"></input>
 
       <Code>{setUpAccountTransaction}</Code>
       <Code>{metadata}</Code>

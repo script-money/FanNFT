@@ -33,21 +33,21 @@ const CreatePackage = () => {
   const context = useContext(userContext)
   const [status, setStatus] = useState('Not started')
   const [transaction, setTransaction] = useState(null)
-
   const [title, setTitle] = useState('')
   const [totalNumber, setTotalNumber] = useState(0)
   const [content, setContent] = useState('')
   const [keyWord, setKeyWord] = useState('')
-  const [deadline, setDeadline] = useState(Date.now() + 1000 * 3 * 60)
+  // deadline为了测试截止时间设置为3分钟后，前端需要让用户选择，使用second上传到合约
+  const [deadline, setDeadline] = useState((Date.now() / 1000) | (3 * 60))
   const [metadata, setMetadata] = useState('')
 
   useEffect(() => {
     const metaString = JSON.stringify({
       title,
-      image: 'https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg',
-      content: content + ' ' + context.address,
-      keyWord: '#' + keyWord,
-      createAt: Date.now(),
+      image: 'https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg', // 让用户自己上传url
+      content: content + ' ' + context.address, // 在内容后添加地址。如果是用户转发，替换成用户自己的地址
+      keyWord: '#FanNFT #' + keyWord, // 使用hashtag为 "#FanNFT #[keyWord]" 才能从Twitter的API获取
+      createAt: (Date.now() / 1000) | 0,
       deadline,
     })
     setMetadata(metaString)
@@ -115,7 +115,12 @@ const CreatePackage = () => {
       <Code>Signer is: {context.address}</Code>
 
       <input value={title} onChange={titleHandleChange} placeholder="输入礼包名"></input>
-      <input type="number" value={totalNumber} onChange={totalNumberHandleChange} placeholder="礼物总数"></input>
+      <input
+        type="number"
+        value={totalNumber}
+        onChange={totalNumberHandleChange}
+        placeholder="礼物总数"
+      ></input>
       <input value={content} onChange={contentHandleChange} placeholder="输入转发内容"></input>
       <input value={keyWord} onChange={keyWordHandleChange} placeholder="输入关键词"></input>
       <input type="number" value={deadline} onChange={deadlineHandleChange} placeholder="输入截止日期"></input>

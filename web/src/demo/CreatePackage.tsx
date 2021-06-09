@@ -45,8 +45,8 @@ const CreatePackage = () => {
     const metaString = JSON.stringify({
       title,
       image: 'https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg',
-      content,
-      keyWord,
+      content: content + ' ' + context.address,
+      keyWord: '#' + keyWord,
       createAt: Date.now(),
       deadline,
     })

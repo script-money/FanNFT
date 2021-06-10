@@ -166,7 +166,8 @@ def get_address_from_twitter(keyword: str, start_time: int, end_time: int) -> li
     Returns:
         list[str]: [符合条件tweet的地址列表]
     """
-    if consumer_key == '' | consumer_secret == '' | access_token_key == '' | access_token_secret == '':
+    if consumer_key == '' or consumer_secret == '' or access_token_key == '' \
+            or access_token_secret == '':
         logger.error('TwitterAPI env variable are not set')
         return []
     result = None
@@ -176,7 +177,7 @@ def get_address_from_twitter(keyword: str, start_time: int, end_time: int) -> li
                              access_token_key, access_token_secret, proxy_url=proxy_url)
             tolerance = 0
             if os.getenv('DEV_ENV') == 'emulator':
-                tolerance = 60*60*24  # 为了方便调试，前后时间范围扩大了24小时，生产环境tolerance为0
+                tolerance = 60*60*48  # 为了方便调试，前后时间范围扩大了48小时，生产环境tolerance为0
             tweets: TwitterResponse = api.request(
                 'search/tweets',
                 {'q': f'#FanNFT {keyword} since_time:{start_time-tolerance} until_time:{end_time+tolerance}',

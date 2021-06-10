@@ -18,7 +18,11 @@ transaction(packageID: UInt32) {
         let collection <- packageRef.batchMintGift(packageID: packageID)
         let ids = collection.getIDs()
         let addresses = packageRef.rewardAdresses
-        for id in ids{             
+        var newIds:[UInt64] = []
+        for newAddress in addresses{
+          newIds.append(ids.removeLast())
+        }
+        for id in newIds{             
           let recieverAddress = addresses[id-(1 as UInt64)]      
           let recipient = getAccount(recieverAddress)
           let receiver = recipient

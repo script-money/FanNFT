@@ -1,0 +1,3 @@
+flow-py-sdk==0.2.0
+TwitterAPI==2.7.3
+python-dotenv==0.17.1

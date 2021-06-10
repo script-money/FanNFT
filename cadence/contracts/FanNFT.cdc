@@ -97,7 +97,7 @@ pub contract FanNFT: NonFungibleToken {
       }
     
       pub fun mintGift(): @NFT{
-        let newMoment: @NFT <- create NFT(
+        let newGift: @NFT <- create NFT(
           packageID: self.packageID,
           serialNumber: self.numberGiftMinted + (1 as UInt32),
         )
@@ -105,10 +105,10 @@ pub contract FanNFT: NonFungibleToken {
         self.numberGiftMinted = self.numberGiftMinted + (1 as UInt32) 
                
         let packageDataToModify = FanNFT.packageDatas[self.packageID]!
-        packageDataToModify.giftIDs.append(newMoment.id)
+        packageDataToModify.giftIDs.append(newGift.id)
         FanNFT.packageDatas[self.packageID] = packageDataToModify
 
-        return <-newMoment                            
+        return <-newGift
       }
 
       pub fun batchMintGift(packageID: UInt32): @Collection{

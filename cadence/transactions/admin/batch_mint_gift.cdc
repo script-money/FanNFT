@@ -12,26 +12,26 @@ transaction(packageID: UInt32) {
         self.adminRef = acct.borrow<&FanNFT.Admin>(from: /storage/FanNFTAdmin)!
     }
 
-    execute {
-      
+    execute { 
         let packageRef = self.adminRef.borrowPackage(packageID: packageID)
+
         let collection <- packageRef.batchMintGift(packageID: packageID)
         let ids = collection.getIDs()
         let addresses = packageRef.rewardAdresses
-        var newIds:[UInt64] = []
-        for newAddress in addresses{
-          newIds.append(ids.removeLast())
-        }
-        for id in newIds{             
-          let recieverAddress = addresses[id-(1 as UInt64)]      
-          let recipient = getAccount(recieverAddress)
+    
+        var i = 0
+        while i < addresses.length{
+          let lastId = ids.removeLast()
+          let address = addresses.removeLast()
+          let recipient = getAccount(address)
           let receiver = recipient
             .getCapability(FanNFT.GiftPublicPath)
             .borrow<&{NonFungibleToken.CollectionPublic}>()
             ?? panic("Could not get receiver reference to the NFT Collection")
-          receiver.deposit(token: <-collection.withdraw(withdrawID:id))
+          receiver.deposit(token: <-collection.withdraw(withdrawID:lastId))
         }
         
-        self.adminRef.saveEmptyCollection(emptyCollection: <-collection)
+        // 防止资源丢失
+        self.adminRef.cleanEmptyCollection(emptyCollection: <-collection)  
     }
 }

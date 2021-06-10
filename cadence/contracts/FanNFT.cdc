@@ -293,8 +293,8 @@ pub contract FanNFT: NonFungibleToken {
         FanNFT.packages[newPackage.packageID] <-! newPackage
       }
 
-      pub fun saveEmptyCollection(emptyCollection: @Collection){
-        FanNFT.account.save<@Collection>(<-emptyCollection, to: FanNFT.GiftStoragePath)
+      pub fun cleanEmptyCollection(emptyCollection: @Collection){
+        destroy(emptyCollection)
       }
     }
 

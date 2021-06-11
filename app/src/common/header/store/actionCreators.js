@@ -23,7 +23,6 @@ export const toggleConnectWallet = (event,connectWallet) => {
     try {
       dispatch(connectWallet())
     } catch (err) {}
-  }
   // return async (dispatch) => {
   //   try {
   //     let user = fcl.currentUser().subscribe(connectWallet);

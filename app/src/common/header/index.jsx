@@ -41,12 +41,13 @@ class Header extends PureComponent{
             <Col span={1}/>
             <Col span={2}>
               {
-                connectWallet ? null :
+                connectWallet ?
                 <Link to="/gift">
                   <div>
                     我的礼物
                   </div>
                 </Link>
+                : null
               }
             </Col>
             <Col span={15}/>

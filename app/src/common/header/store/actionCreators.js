@@ -7,21 +7,22 @@ export const userInfo = (user) => ({
   value: fromJS(user)
 });
 
-export const connectWallet = (connectWallet) => ({
+export const connectWalletWord = (connectWallet) => ({
   type: constants.CONNECTWALLET,
   connectWallet
 });
 
 export const toggleConnectWallet = (event,connectWallet) => {
   event.preventDefault();
-  return(dispatch) => {
+  return async(dispatch) => {
     if(connectWallet) {
       fcl.unauthenticate()
       } else {
       fcl.authenticate()
     }
     try {
-      dispatch(connectWallet())
+      let user = fcl.currentUser().subscribe(connectWallet);
+      await dispatch(connectWalletWord())
     } catch (err) {}
   // return async (dispatch) => {
   //   try {

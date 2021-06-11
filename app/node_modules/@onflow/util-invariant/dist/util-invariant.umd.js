@@ -1,0 +1,2 @@
+!function(n,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((n=n||self).utilInvariant={})}(this,function(n){n.invariant=function(n,t){if(!n){var e,i=new Error("INVARIANT "+t);throw i.stack=i.stack.split("\n").filter(function(n){return!/at invariant/.test(n)}).join("\n"),(e=console).error.apply(e,["\n\n---\n\n",i,"\n\n"].concat([].slice.call(arguments,2),["\n\n---\n\n"])),i}}});
+//# sourceMappingURL=util-invariant.umd.js.map

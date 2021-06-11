@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@onflow/dev-wallet": "^0.0.10",
+    "@onflow/fcl": "^0.0.71",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@svgr/webpack": "5.5.0",
     "@testing-library/jest-dom": "^5.11.4",
@@ -80,7 +82,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "dev-wallet": "PK=67ff105cfed60b0db9f95960851b9b96a73a03e972a09195a0efa709a828958b SERVICE_ADDR=f8d6e0586b0a20c7 fcl-wallet"
   },
   "eslintConfig": {
     "extends": [

@@ -1581,7 +1581,7 @@
   dependencies:
     rlp "^2.2.4"
 
-"@onflow/fcl-config@0.0.1", "@onflow/fcl-config@^0.0.1":
+"@onflow/fcl-config@0.0.1":
   version "0.0.1"
   resolved "https://registry.nlark.com/@onflow/fcl-config/download/@onflow/fcl-config-0.0.1.tgz#e983f6bdad96a09753ca2000633d7bfed7587527"
   integrity sha1-6YP2va2WoJdTyiAAYz17/tdYdSc=

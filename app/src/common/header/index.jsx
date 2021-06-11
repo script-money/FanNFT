@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import './index.less';
 import { actionCreatorsHeader } from './store';
+import * as fcl from '@onflow/fcl'
 
 class Header extends PureComponent{
   constructor(props) {
@@ -49,9 +50,9 @@ class Header extends PureComponent{
               }
             </Col>
             <Col span={15}/>
-            <Col span={2} onClick={handleToggleConnectWallet}>
-              <div className={connectWallet ? "walletName" : "walletNameActive"}>  
-                {connectWallet ? "连接钱包" : "断开连接"}
+            <Col span={2} onClick={(event) => handleToggleConnectWallet(event,connectWallet)}>
+              <div className={connectWallet ? "walletNameActive" : "walletName"}>  
+                {connectWallet ? "断开连接" : "连接钱包"}
               </div>
             </Col>
             <Col span={1}/>
@@ -68,8 +69,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => {
   return{
-    handleToggleConnectWallet() {
-      dispatch(actionCreatorsHeader.toggleConnectWallet())
+    handleToggleConnectWallet(event,connectWallet) {
+      dispatch(actionCreatorsHeader.toggleConnectWallet(event,connectWallet))
     }
   }
 }

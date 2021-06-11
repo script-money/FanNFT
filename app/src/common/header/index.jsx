@@ -44,7 +44,7 @@ class Header extends PureComponent{
                 connectWallet ?
                 <Link to="/gift">
                   <div>
-                    我的礼物
+                    我收到的礼物
                   </div>
                 </Link>
                 : null

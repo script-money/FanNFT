@@ -5,6 +5,7 @@
   "dependencies": {
     "@onflow/dev-wallet": "^0.0.10",
     "@onflow/fcl": "^0.0.71",
+    "@onflow/types": "^0.0.4",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@svgr/webpack": "5.5.0",
     "@testing-library/jest-dom": "^5.11.4",

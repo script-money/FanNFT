@@ -4,6 +4,7 @@ import * as constants from './constants';
 const defaultState = fromJS({
   user: null,
   connectWallet: false,
+  data: null
 });
 
 export default (state = defaultState, action) => {

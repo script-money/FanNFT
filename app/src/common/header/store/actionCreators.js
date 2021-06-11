@@ -29,5 +29,4 @@ export const toggleConnectWallet = (event,connectWallet) => {
   //     await dispatch(userInfo(user))
   //   } catch (err) {}
   // }
-};
-
+}}

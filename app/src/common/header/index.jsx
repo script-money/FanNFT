@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Row, Col } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -6,15 +6,18 @@ import './index.less';
 import { actionCreatorsHeader } from './store';
 import * as fcl from '@onflow/fcl'
 
-class Header extends PureComponent{
+class Header extends Component{
   constructor(props) {
     super(props);
     this.state = {
       left: 0
     }
   }
+
   componentDidMount() {
     let that = this;
+    // let user = fcl.currentUser().subscribe(this.props.user);
+    // this.props.handleUserInfo(user);
     window.onscroll = function () {
       let sl = -Math.max(document.body.scrollLeft, document.documentElement.scrollLeft);
       let left = (sl) + 'px';
@@ -50,7 +53,19 @@ class Header extends PureComponent{
                 : null
               }
             </Col>
-            <Col span={15}/>
+            <Col span={12}/>
+            <Col span={2}>
+              {
+                connectWallet ?
+                <Link to="/createpackage">
+                  <div>
+                    创建礼物包
+                  </div>
+                </Link>
+                : null
+              }
+            </Col>
+            <Col span={1}/>
             <Col span={2} onClick={(event) => handleToggleConnectWallet(event,connectWallet)}>
               <div className={connectWallet ? "walletNameActive" : "walletName"}>  
                 {connectWallet ? "断开连接" : "连接钱包"}
@@ -66,13 +81,17 @@ class Header extends PureComponent{
 
 const mapStateToProps = (state) => ({
   connectWallet: state.getIn(['header', 'connectWallet']),
+  user: state.getIn(['header', 'user']),
 });
 
 const mapDispatchToProps = (dispatch) => {
   return{
     handleToggleConnectWallet(event,connectWallet) {
       dispatch(actionCreatorsHeader.toggleConnectWallet(event,connectWallet))
-    }
+    },
+    handleUserInfo(user) {
+      dispatch(actionCreatorsHeader.userInfo(user))
+    },
   }
 }
 

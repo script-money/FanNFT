@@ -2,7 +2,7 @@ import { fromJS } from 'immutable';
 import * as constants from './constants';
 
 const defaultState = fromJS({
-  user: null,
+  user: [],
   connectWallet: false,
   data: null
 });
@@ -15,7 +15,11 @@ export default (state = defaultState, action) => {
       })
     case constants.USERINFO:
       return state.merge({
-        'user': action.value,
+        'user': action.user,
+      })
+    case constants.DATAINFO:
+      return state.merge({
+        'data': action.user,
       })
     default:
       return state;

@@ -144,3 +144,5 @@ cython_debug/
 
 # reasearh notebook
 *.ipynb
+
+.build.sh

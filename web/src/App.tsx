@@ -1,14 +1,5 @@
 import styled from 'styled-components'
-
-import Section from './components/Section'
-import Header from './components/Header'
-
-import GetPackages from './demo/GetPackages'
-import GetGifts from './demo/GetGifts'
-import Authenticate from './demo/Authenticate'
-import UserInfo from './demo/UserInfo'
-import SetUpAccount from './demo/SetUpAccount'
-import CreatePackage from './demo/CreatePackage'
+import Header from './app/Header'
 
 const Wrapper = styled.div`
   font-size: 13px;
@@ -18,15 +9,7 @@ const Wrapper = styled.div`
 function App() {
   return (
     <Wrapper>
-      <Section>
-        <Header>FCL wallet interactions</Header>
-        <Authenticate />
-        <UserInfo />
-        <SetUpAccount />
-        <GetPackages />
-        <GetGifts />
-        <CreatePackage />
-      </Section>
+      <Header />
     </Wrapper>
   )
 }

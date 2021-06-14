@@ -10,6 +10,7 @@
     "@types/react-dom": "^16.9.8",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "shortid": "^2.2.16",
     "styled-components": "^5.3.0",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@onflow/dev-wallet": "^0.0.10",
+    "@types/react-router-dom": "^5.1.7",
     "@types/shortid": "^0.0.29",
     "@types/styled-components": "^5.1.9",
     "@typescript-eslint/eslint-plugin": "^4.4.1",

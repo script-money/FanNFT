@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import * as fcl from '@onflow/fcl'
 import * as t from '@onflow/types'
 import { ReplaceAddress } from '../config'
 
-import Card from './Card'
-import Header from './Header'
-import Code from './Code'
+import Card from '../demo/Card'
+import Header from '../demo/Header'
+import Code from '../demo/Code'
 
-import { userContext } from './Authenticate'
+// import { userStatusContext } from '../context'
 
 const getGiftsScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -26,22 +26,22 @@ pub fun main(address: Address): [UInt64] {
 
 const getGiftsScript = ReplaceAddress(getGiftsScriptSource)
 
-const GetGifts = () => {
+const GetGiftsPage = () => {
   const [data, setData] = useState(null)
   const [user, setUser] = useState(null)
-  const context = React.useContext(userContext)
+  // const userStatus = useContext(userStatusContext)
 
   useEffect(() => fcl.currentUser().subscribe((user: any) => setUser({ ...user })), [])
 
   const getGiftsButton = async (event: any) => {
     event.preventDefault()
 
-    try {
-      const res = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(context.address, t.Address)])])
-      setData(await fcl.decode(res))
-    } catch (error) {
-      setData(error)
-    }
+    // try {
+    //   const res = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(userStatus.address, t.Address)])])
+    //   setData(await fcl.decode(res))
+    // } catch (error) {
+    //   setData(error)
+    // }
   }
 
   return (
@@ -57,4 +57,4 @@ const GetGifts = () => {
   )
 }
 
-export default GetGifts
+export default GetGiftsPage

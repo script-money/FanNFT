@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FC, createContext } from 'react'
 import * as fcl from '@onflow/fcl'
 
-import Card from '../components/Card'
+import Card from './Card'
 
 interface SignInOutButtonProps {
   user: User
@@ -21,12 +21,13 @@ const initUserContext: IUserContext = {
 
 export const userContext = createContext(initUserContext)
 
-const SignInOutButton: FC<SignInOutButtonProps> = ({ user: { loggedIn } }) => {
+export const SignInOutButton: FC<SignInOutButtonProps> = ({ user: { loggedIn } }) => {
   const signInOrOut = async (event: any) => {
     event.preventDefault()
 
     if (loggedIn) {
       fcl.unauthenticate()
+      localStorage.removeItem('userInitStatus')
     } else {
       fcl.authenticate()
     }

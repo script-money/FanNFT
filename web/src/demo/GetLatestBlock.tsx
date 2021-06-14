@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 
 import { decode, send, getLatestBlock } from '@onflow/fcl'
 
-import Card from '../components/Card'
-import Code from '../components/Code'
+import Card from './Card'
+import Code from './Code'
 
 const GetLatestBlock = () => {
   const [data, setData] = useState(null)

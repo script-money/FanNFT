@@ -1,16 +1,16 @@
 import styled from 'styled-components'
 import Header from './app/Header'
-
-const Wrapper = styled.div`
+import Authenticate from './app/Authenticate'
+const FontWrapper = styled.div`
   font-size: 13px;
   font-family: Arial, Helvetica, sans-serif;
 `
 
 function App() {
   return (
-    <Wrapper>
-      <Header />
-    </Wrapper>
+    <FontWrapper>
+      <Authenticate />
+    </FontWrapper>
   )
 }
 

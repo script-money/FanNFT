@@ -10,12 +10,23 @@ const StyledMainContent = styled.div`
   border: 2px solid black;
 `
 
+const ContentWrapper = styled.div`
+  border: 2px solid black;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+`
+
+const Title = styled.div`
+  border: 2px solid black;
+`
+
 const Content = (props: ContentProps) => {
   return (
-    <>
-      <title>{props.title}</title>
+    <ContentWrapper>
+      <Title>{props.title}</Title>
       <StyledMainContent>{props.children}</StyledMainContent>
-    </>
+    </ContentWrapper>
   )
 }
 

@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, createContext } from 'react'
 import * as fcl from '@onflow/fcl'
-import { useThrottleEffect } from 'ahooks'
-import { SignInOutButton } from '../demo/Authenticate'
+import Header from './Header'
 
 export type SessionUser = {
   addr: string | null
@@ -13,28 +12,26 @@ export type SessionUser = {
   services?: []
 }
 
-const Authenticate = () => {
-  const [user, setUser] = useState<SessionUser>({ loggedIn: false, addr: '' })
+export const SessionUserDefault = { loggedIn: false, addr: '' }
 
-  useThrottleEffect(
-    () => {
-      fcl.currentUser().subscribe((user: SessionUser) => {
-        if (user.loggedIn === null) {
-          fcl.authenticate()
-        } else {
-          setUser({ ...user })
-        }
-      })
-    },
-    [user.addr],
-    {
-      wait: 1000,
-    }
-  )
+export const SessionUserContext = createContext<SessionUser>(SessionUserDefault)
+
+const Authenticate = () => {
+  const [user, setUser] = useState<SessionUser>(SessionUserDefault)
+
+  useEffect(() => {
+    fcl.currentUser().subscribe((user: SessionUser) => {
+      if (user.loggedIn === null) {
+        fcl.authenticate()
+      } else {
+        setUser({ ...user })
+      }
+    })
+  }, [user.addr])
   return (
-    <>
-      <SignInOutButton user={user}></SignInOutButton>
-    </>
+    <SessionUserContext.Provider value={user}>
+      <Header />
+    </SessionUserContext.Provider>
   )
 }
 

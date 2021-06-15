@@ -9,7 +9,7 @@ type PackageData = {
 }
 
 interface IPackageData {
-  source: PackageData[]
+  data: PackageData[]
 }
 
 const PackagesContainer = (props: IPackageData) => {
@@ -17,17 +17,17 @@ const PackagesContainer = (props: IPackageData) => {
 
   useEffect(() => {
     console.log(props)
-    if (props.source.length == 0) {
+    if (props.data.length == 0) {
     }
   }, [])
 
   return (
     <>
-      {props.source.length > 0 &&
+      {/* {props.source.length > 0 &&
         props.source.forEach((packageData) => {
-          ;<p>packageData</p>
+          // ;<p>packageData</p>
           // <PackageInfo data={packageData} />
-        })}
+        })} */}
     </>
   )
 }

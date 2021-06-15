@@ -1,11 +1,12 @@
-import { Component } from 'react'
+import { useContext } from 'react'
 import styled from 'styled-components'
 import logoPic from '../assets/logo.png'
-import Authenticate from '../app/Authenticate'
 import { BrowserRouter as Router, NavLink, Switch, Route } from 'react-router-dom'
-import CreatePackagePage from '../page/CreatePackagePage'
 import MyGiftsPage from '../page/MyGiftsPage'
 import GetPackagesPage from '../page/GetPackagesPage'
+import CreatePackagePageV2 from '../page/CreatePackagePageV2'
+import { SignInOutButton } from '../demo/Authenticate'
+import { SessionUserContext } from '../app/Authenticate'
 
 const HeaderWrapper = styled.div`
   padding: 0 10px;
@@ -57,47 +58,47 @@ const StyledLink = styled(NavLink)`
   }
 `
 
-class Header extends Component {
-  render() {
-    return (
-      <Router>
-        <HeaderWrapper>
-          <Logo href="/" />
-          <Nav>
-            <NavItem>
-              <StyledLink to="/" activeClassName="current" exact>
-                首页
-              </StyledLink>
-            </NavItem>
-            <NavItem>
-              <StyledLink to="/gift" activeClassName="current" exact>
-                我的礼物
-              </StyledLink>
-            </NavItem>
-            <NavItem>
-              <StyledLink to="/create" activeClassName="current" exact>
-                创建礼包
-              </StyledLink>
-            </NavItem>
-          </Nav>
-          <AuthenticateWrapper>
-            <Authenticate />
-          </AuthenticateWrapper>
-        </HeaderWrapper>
-        <Switch>
-          <Route path="/create">
-            <CreatePackagePage />
-          </Route>
-          <Route path="/gift">
-            <MyGiftsPage />
-          </Route>
-          <Route path="/">
-            <GetPackagesPage />
-          </Route>
-        </Switch>
-      </Router>
-    )
-  }
+const Header = () => {
+  const sessionUser = useContext(SessionUserContext)
+
+  return (
+    <Router>
+      <HeaderWrapper>
+        <Logo href="/" />
+        <Nav>
+          <NavItem>
+            <StyledLink to="/" activeClassName="current" exact>
+              首页
+            </StyledLink>
+          </NavItem>
+          <NavItem>
+            <StyledLink to="/gift" activeClassName="current" exact>
+              我的礼物
+            </StyledLink>
+          </NavItem>
+          <NavItem>
+            <StyledLink to="/create" activeClassName="current" exact>
+              创建礼包
+            </StyledLink>
+          </NavItem>
+          <NavItem>
+            <SignInOutButton user={sessionUser}></SignInOutButton>
+          </NavItem>
+        </Nav>
+      </HeaderWrapper>
+      <Switch>
+        <Route path="/create">
+          <CreatePackagePageV2 />
+        </Route>
+        <Route path="/gift">
+          <MyGiftsPage />
+        </Route>
+        <Route path="/">
+          <GetPackagesPage />
+        </Route>
+      </Switch>
+    </Router>
+  )
 }
 
 export default Header

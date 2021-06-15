@@ -92,9 +92,9 @@ const Authenticate = () => {
   return (
     <>
       <SignInOutButton user={user}></SignInOutButton>
-      <p>userStatus: {userInitStatus ? '账户已经初始化' : '账户未初始化'}</p>
+      {/* <p>userStatus: {userInitStatus ? '账户已经初始化' : '账户未初始化'}</p>
       <p>transactionText: {transactionText}</p>
-      <p>{transaction && JSON.stringify(transaction, null, 2)}</p>
+      <p>{transaction && JSON.stringify(transaction, null, 2)}</p> */}
     </>
   )
 }

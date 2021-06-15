@@ -2,44 +2,58 @@ import { Component } from 'react'
 import styled from 'styled-components'
 import logoPic from '../assets/logo.png'
 import Authenticate from '../app/Authenticate'
-import { BrowserRouter as Router, Link, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, NavLink, Switch, Route } from 'react-router-dom'
 import CreatePackagePage from '../page/CreatePackagePage'
 import MyGiftsPage from '../page/MyGiftsPage'
 import GetPackagesPage from '../page/GetPackagesPage'
 
 const HeaderWrapper = styled.div`
-  height: 56px;
+  padding: 0 10px;
+  height: 100px;
   background: white;
+  display: flex;
+  justify-content: space-around;
 `
 const Logo = styled.a`
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
+  display: flex;
   width: 100px;
-  height: 56px;
   background: url(${logoPic});
-  background-size: contain;
+  background-size: cover;
+  padding-top: 10px;
 `
-export const Nav = styled.div`
-  width: 960px;
-  height: 100%;
-  margin: 0 auto;
+const Nav = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex: 1;
 `
 
-export const NavItem = styled.div`
-  line-height: 56px;
-  padding: 0 15px;
+const NavItem = styled.div`
+  margin-left: 20px;
   font-size: 17px;
   color: #333;
-  &.left {
-    float: left;
+  justify-content: space-around;
+`
+
+const AuthenticateWrapper = styled.div`
+  display: flex;
+  width: 100px;
+  align-items: center;
+`
+
+const StyledLink = styled(NavLink)`
+  text-decoration: none;
+  color: RGB(245, 192, 237);
+  &:focus,
+  &:hover,
+  &:visited,
+  &:link,
+  &:active {
+    text-decoration: none;
   }
-  &.right {
-    float: right;
-  }
-  &.active {
-    color: #ea6f5a;
+
+  &.current {
+    border-bottom: 2px solid black;
   }
 `
 
@@ -50,31 +64,37 @@ class Header extends Component {
         <HeaderWrapper>
           <Logo href="/" />
           <Nav>
-            <NavItem className="left active">
-              <Link to="/">首页</Link>
+            <NavItem>
+              <StyledLink to="/" activeClassName="current" exact>
+                首页
+              </StyledLink>
             </NavItem>
-            <NavItem className="left">
-              <Link to="/gift">我的礼物</Link>
+            <NavItem>
+              <StyledLink to="/gift" activeClassName="current" exact>
+                我的礼物
+              </StyledLink>
             </NavItem>
-            <NavItem className="right">
-              <Authenticate />
-            </NavItem>
-            <NavItem className="right">
-              <Link to="/create">创建礼包</Link>
+            <NavItem>
+              <StyledLink to="/create" activeClassName="current" exact>
+                创建礼包
+              </StyledLink>
             </NavItem>
           </Nav>
-          <Switch>
-            <Route path="/create">
-              <CreatePackagePage />
-            </Route>
-            <Route path="/gift">
-              <MyGiftsPage />
-            </Route>
-            <Route path="/">
-              <GetPackagesPage />
-            </Route>
-          </Switch>
+          <AuthenticateWrapper>
+            <Authenticate />
+          </AuthenticateWrapper>
         </HeaderWrapper>
+        <Switch>
+          <Route path="/create">
+            <CreatePackagePage />
+          </Route>
+          <Route path="/gift">
+            <MyGiftsPage />
+          </Route>
+          <Route path="/">
+            <GetPackagesPage />
+          </Route>
+        </Switch>
       </Router>
     )
   }

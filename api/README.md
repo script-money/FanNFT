@@ -17,4 +17,17 @@ python3.9 的环境, `pip install -r requirements.txt`
 
 1. 参考web/中的提示，运行模拟器，部署合约，启动dev-wallet，运行web，然后在web端用用户账户去create package
 2. `cp .env.example .env`，然后在`.env`中填入twitter开发者相关的参数
-3. 每运行一次`python main.py`，会对满足条件的package进行mint
+3. 使用`python main.py`运行，每60秒会对满足条件的package进行mint
+
+## 使用方法（testnet）
+
+如果直接运行
+
+1. 修改 .env 为 `DEV_ENV=testnet`
+2. `python main.py`
+
+如果使用Docker
+
+1. 修改 .env 为 `DEV_ENV=testnet`
+2. 参考 .build.example.sh 的指令构建镜像
+3. 使用 `docker run -it -d --name fannft scriptmoney/fannft:0.0.1` 运行程序

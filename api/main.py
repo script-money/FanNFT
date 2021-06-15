@@ -230,7 +230,7 @@ def get_mint_packages(array: cadence.Array) -> list[tuple[list[str], int, str, i
                 lambda f: f['name'] == 'totalNumber', fields))[0]
             total_number = int(total_number_field['value']['value'])
             result.append((address_list, package_id,
-                          key_word, create_at, deadline, total_number))
+                           key_word, create_at, deadline, total_number))
     return result
 
 
@@ -255,6 +255,17 @@ def select_addresses(address_from_twitter_source: list[str], exists_address: lis
         return address_from_twitter[:total_number]
 
 
+def periodic(period):
+    def scheduler(fcn):
+        async def wrapper(*args, **kwargs):
+            while True:
+                asyncio.create_task(fcn(*args, **kwargs))
+                await asyncio.sleep(period)
+        return wrapper
+    return scheduler
+
+
+@periodic(60)
 async def main():
     package_array: cadence.Array = await get_packages_data()  # 从合约获取package_data
     to_mint_packages = get_mint_packages(package_array)  # 解析package_data，得到列表

@@ -22,7 +22,7 @@ class Config(object):
             self.access_node_host: str = "localhost"
             self.access_node_port: int = 3569
         elif self.dev_env == 'testnet':
-            self.access_node_host: str = 'access.mainnet.nodes.onflow.org'
+            self.access_node_host: str = 'access.devnet.nodes.onflow.org'
             self.access_node_port: int = 9000
 
         self.service_account_key_id: int = 0
@@ -46,10 +46,10 @@ class Config(object):
                         data["accounts"]["emulator-account"]["keys"],
                     )
                 elif self.dev_env == 'testnet':
-                    service_account_address_base = data["accounts"]["testnet-account"]["address"]
-                    self.service_account_address_str = '0x'+service_account_address_base
+                    self.service_account_address_str = os.getenv(
+                        'TESTNET_ADDRESS')
                     self.service_account_address = Address.from_hex(
-                        service_account_address_base
+                        self.service_account_address_str
                     )
                     self.service_account_signer = InMemorySigner(
                         HashAlgo.from_string(
@@ -58,7 +58,7 @@ class Config(object):
                         SignAlgo.from_string(
                             data["accounts"]["testnet-account"]["sigAlgorithm"]
                         ),
-                        data["accounts"]["testnet-account"]["keys"],
+                        os.getenv('TESTNET_PRIVATE_KEY'),
                     )
         except Exception:
             log.warning(

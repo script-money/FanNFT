@@ -6,8 +6,7 @@ import { ReplaceAddress } from '../config'
 import Card from './Card'
 import Header from './Header'
 import Code from './Code'
-
-import { userContext } from './Authenticate'
+import { SessionUser } from '../app/Authenticate'
 
 const getGiftsScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -28,8 +27,7 @@ const getGiftsScript = ReplaceAddress(getGiftsScriptSource)
 
 const GetGifts = () => {
   const [data, setData] = useState(null)
-  const [user, setUser] = useState(null)
-  const context = React.useContext(userContext)
+  const [user, setUser] = useState<SessionUser>({ loggedIn: false, addr: '' })
 
   useEffect(() => fcl.currentUser().subscribe((user: any) => setUser({ ...user })), [])
 
@@ -37,7 +35,7 @@ const GetGifts = () => {
     event.preventDefault()
 
     try {
-      const res = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(context.address, t.Address)])])
+      const res = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(user.addr, t.Address)])])
       setData(await fcl.decode(res))
     } catch (error) {
       setData(error)

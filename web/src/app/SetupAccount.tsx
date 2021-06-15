@@ -1,10 +1,7 @@
-import React, { useState, useContext } from 'react'
-import * as fcl from '@onflow/fcl'
 import { ReplaceAddress } from '../config'
-
-import Card from './Card'
-import Header from './Header'
-import Code from './Code'
+import { useState } from 'react'
+import { useLocalStorageState } from 'ahooks'
+import * as fcl from '@onflow/fcl'
 
 const setUpAccountTransactionSource = `\
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
@@ -19,12 +16,15 @@ pub fun hasGifts(_ address: Address): Bool {
 transaction {
   prepare(signer: AuthAccount) {
     if !hasGifts(signer.address){
+      log("account init start")
       if signer.borrow<&FanNFT.Collection>(from: FanNFT.GiftStoragePath) == nil {
         signer.save(<-FanNFT.createEmptyCollection(), to: FanNFT.GiftStoragePath)
       }
       signer.unlink(FanNFT.GiftPublicPath)
       signer.link<&{NonFungibleToken.CollectionPublic,FanNFT.GiftCollectionPublic}>
         (FanNFT.GiftPublicPath,target: FanNFT.GiftStoragePath)
+    }else{
+      log("account init already")
     }
   }
 }
@@ -32,15 +32,12 @@ transaction {
 
 const setUpAccountTransaction = ReplaceAddress(setUpAccountTransactionSource)
 
-const SetUpAccount = () => {
-  const [status, setStatus] = useState('Not started')
+const SetupAccount = () => {
+  const [userInitStatus, setUserInitStatus] = useLocalStorageState('userInitStatus', false)
+  const [transactionText, setTransactionText] = useState('')
   const [transaction, setTransaction] = useState(null)
 
-  const sendTransaction = async (event: any) => {
-    event.preventDefault()
-
-    setStatus('Resolving...')
-
+  const sendSetupAccountTransaction = async () => {
     const blockResponse = await fcl.send([fcl.getLatestBlock()])
     const block = await fcl.decode(blockResponse)
 
@@ -54,34 +51,28 @@ const SetUpAccount = () => {
         fcl.limit(999),
       ])
 
-      setStatus('Transaction sent, waiting for confirmation' + ' trxId: ' + transactionId)
+      setTransactionText('Transaction sent, waiting for confirmation' + ' trxId: ' + transactionId)
 
       const unsub = fcl.tx({ transactionId }).subscribe((transaction: React.SetStateAction<null>) => {
         setTransaction(transaction)
 
         if (fcl.tx.isSealed(transaction)) {
-          setStatus('Transaction is Sealed')
+          setTransactionText('Transaction is Sealed')
           unsub()
+          setUserInitStatus(true)
         }
       })
     } catch (error) {
-      setStatus('Transaction failed: ' + error)
+      setTransactionText('Transaction failed: ' + error)
     }
   }
 
   return (
-    <Card>
-      <Header>set Up Account(Transaction)</Header>
-
-      <Code>{setUpAccountTransaction}</Code>
-
-      <button onClick={sendTransaction}>Send</button>
-
-      <Code>Status: {status}</Code>
-
-      {transaction && <Code>{JSON.stringify(transaction, null, 2)}</Code>}
-    </Card>
+    <>
+      ({userInitStatus === false && <button onClick={sendSetupAccountTransaction}>设置账户</button>})
+      {/* TODO 显示transactionText和transaction */}
+    </>
   )
 }
 
-export default SetUpAccount
+export default SetupAccount

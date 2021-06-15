@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react'
 import * as fcl from '@onflow/fcl'
 import { ReplaceAddress } from '../config'
-
-import Card from '../demo/Card'
-import Header from '../demo/Header'
-import Code from '../demo/Code'
-
+import Content from '../app/Content'
 import PackagesContainer from '../components/PackagesContainer'
 
 const getPackagesScriptSource = `
@@ -37,10 +33,9 @@ const GetPackagesPage = () => {
   }, [])
 
   return (
-    <Card>
-      <Header>Get Package</Header>
-      <PackagesContainer data={data}></PackagesContainer>
-    </Card>
+    <Content title="获取礼包">
+      <PackagesContainer source={data} />
+    </Content>
   )
 }
 

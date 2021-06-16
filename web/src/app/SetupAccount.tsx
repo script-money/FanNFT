@@ -1,7 +1,8 @@
 import { ReplaceAddress } from '../config'
-import { useState } from 'react'
-import { useLocalStorageState } from 'ahooks'
+import { useEffect, useState } from 'react'
+import { useBoolean, useLocalStorageState } from 'ahooks'
 import * as fcl from '@onflow/fcl'
+import styled from 'styled-components'
 
 const setUpAccountTransactionSource = `\
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
@@ -28,6 +29,44 @@ transaction {
     }
   }
 }
+`
+
+const PopBackground = styled.div`
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 5000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const InfoCard = styled.div`
+  width: 500px;
+  height: 300px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+`
+
+const InfoTitle = styled.div`
+  font-size: 3rem;
+`
+
+const InfoText = styled.div`
+  color: grey;
+`
+
+const CloseButton = styled.button`
+  align-self: flex-end;
+`
+
+const OperateButton = styled.button`
+  width: 50px;
+  height: 30px;
 `
 
 const setUpAccountTransaction = ReplaceAddress(setUpAccountTransactionSource)
@@ -63,14 +102,22 @@ const SetupAccount = () => {
         }
       })
     } catch (error) {
+      alert('Transaction failed: ' + error)
       setTransactionText('Transaction failed: ' + error)
     }
   }
 
   return (
     <>
-      ({userInitStatus === false && <button onClick={sendSetupAccountTransaction}>设置账户</button>})
-      {/* TODO 显示transactionText和transaction */}
+      {(userInitStatus === false || userInitStatus === undefined) && (
+        <PopBackground>
+          <InfoCard>
+            <InfoTitle>提示</InfoTitle>
+            <InfoText>进行链上操作前需要初始化账户</InfoText>
+            <OperateButton onClick={sendSetupAccountTransaction}>Approve</OperateButton>
+          </InfoCard>
+        </PopBackground>
+      )}
     </>
   )
 }

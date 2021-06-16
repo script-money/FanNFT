@@ -36,7 +36,9 @@ const GetGifts = () => {
 
     try {
       const res = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(user.addr, t.Address)])])
-      setData(await fcl.decode(res))
+      const resData = await fcl.decode(res)
+      alert(resData)
+      setData(resData)
     } catch (error) {
       setData(error)
     }

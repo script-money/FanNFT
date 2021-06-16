@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import * as fcl from '@onflow/fcl'
 import { ReplaceAddress } from '../config'
 import Content from '../app/Content'
+import PackageInfo from '../components/PackageInfo'
+import { IMetaData, IPackageInfo, PackageInfoDisplay } from '../interfaces'
+import styled from 'styled-components'
+import { PackageInfoContext } from '../app/Header'
 
 const getPackagesScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -14,24 +18,66 @@ pub fun main(): [FanNFT.PackageData] {
 }
 `
 
+const GetPackageWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+`
+
 const getPackagesScript = ReplaceAddress(getPackagesScriptSource)
 
 const GetPackagesPage = () => {
-  const [data, setData] = useState([])
+  const [data, setData] = useState<IPackageInfo[]>([])
+  const [displayData, setDisplayData] = useState<PackageInfoDisplay[]>([])
+  const { state, dispatch } = useContext(PackageInfoContext)
 
   useEffect(() => {
-    async function fetchPackages() {
+    async function fetchAndRenderPackages() {
+      const decodeRes: IPackageInfo[] = []
       try {
         const res = await fcl.send([fcl.script(getPackagesScript)])
-        setData(await fcl.decode(res))
+        const decodeRes = await fcl.decode(res)
+        if (decodeRes !== []) {
+          const displayDataArray = decodeRes.map((packageData: IPackageInfo) => {
+            const meta = JSON.parse(packageData.metadata) as IMetaData
+            console.log('meta', meta)
+            const display = {
+              title: meta.title,
+              url: meta.url,
+              retweet: meta.content,
+              keyword: meta.keyWord,
+              isLocked: packageData.locked,
+              totalNumber: packageData.totalNumber,
+              deadline: new Date(meta.deadline * 1000),
+            } as PackageInfoDisplay
+            return display
+          })
+
+          setDisplayData(displayDataArray)
+        } else {
+          alert('请求的PackageData为空')
+          setDisplayData([])
+        }
+        setData(decodeRes)
+        dispatch({ type: 'UPDATE', result: decodeRes })
       } catch (error) {
-        setData(error)
+        setData([])
       }
     }
-    fetchPackages()
+    fetchAndRenderPackages()
   }, [])
 
-  return <Content title="获取礼包">{/* <PackagesContainer source={data} /> */}</Content>
+  return (
+    <Content title="获取礼包">
+      <GetPackageWrapper>
+        <>
+          {displayData.map((packageDisplay, key) => (
+            <PackageInfo key={key} data={packageDisplay} />
+          ))}
+        </>
+      </GetPackageWrapper>
+    </Content>
+  )
 }
 
 export default GetPackagesPage

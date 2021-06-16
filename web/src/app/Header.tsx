@@ -1,12 +1,16 @@
-import { useContext } from 'react'
+import React, { createContext, useContext, useReducer } from 'react'
 import styled from 'styled-components'
 import logoPic from '../assets/logo.png'
 import { BrowserRouter as Router, NavLink, Switch, Route } from 'react-router-dom'
-import MyGiftsPage from '../page/MyGiftsPage'
 import GetPackagesPage from '../page/GetPackagesPage'
 import CreatePackagePageV2 from '../page/CreatePackagePageV2'
 import { SignInOutButton } from '../demo/Authenticate'
 import { SessionUserContext } from '../app/Authenticate'
+import GetPackages from '../demo/GetPackages'
+import SetUpAccount from '../demo/SetUpAccount'
+import GetGifts from '../demo/GetGifts'
+import { IPackageInfo } from '../interfaces'
+import MyGiftsPage from '../page/MyGiftsPage'
 
 const HeaderWrapper = styled.div`
   padding: 0 10px;
@@ -58,45 +62,98 @@ const StyledLink = styled(NavLink)`
   }
 `
 
+const initialState: State = {
+  data: [],
+}
+
+export const PackageInfoContext = createContext<{
+  state: State
+  dispatch: React.Dispatch<Action>
+}>({
+  state: initialState,
+  dispatch: () => undefined,
+})
+
+type Action = { type: 'UPDATE'; result: IPackageInfo[] }
+type State = { data?: IPackageInfo[] }
+
+const reducer = (state: State, action: Action) => {
+  switch (action.type) {
+    case 'UPDATE':
+      return {
+        data: action.result,
+      }
+    default:
+      return initialState
+  }
+}
+
 const Header = () => {
   const sessionUser = useContext(SessionUserContext)
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   return (
     <Router>
-      <HeaderWrapper>
-        <Logo href="/" />
-        <Nav>
-          <NavItem>
-            <StyledLink to="/" activeClassName="current" exact>
-              首页
-            </StyledLink>
-          </NavItem>
-          <NavItem>
-            <StyledLink to="/gift" activeClassName="current" exact>
-              我的礼物
-            </StyledLink>
-          </NavItem>
-          <NavItem>
-            <StyledLink to="/create" activeClassName="current" exact>
-              创建礼包
-            </StyledLink>
-          </NavItem>
-          <NavItem>
-            <SignInOutButton user={sessionUser}></SignInOutButton>
-          </NavItem>
-        </Nav>
-      </HeaderWrapper>
-      <Switch>
-        <Route path="/create">
-          <CreatePackagePageV2 />
-        </Route>
-        <Route path="/gift">
-          <MyGiftsPage />
-        </Route>
-        <Route path="/">
-          <GetPackagesPage />
-        </Route>
-      </Switch>
+      <PackageInfoContext.Provider value={{ state, dispatch }}>
+        <HeaderWrapper>
+          <Logo href="/" />
+          <Nav>
+            <NavItem>
+              <StyledLink to="/" activeClassName="current" exact>
+                首页
+              </StyledLink>
+            </NavItem>
+            <NavItem>
+              <StyledLink to="/packages" activeClassName="current" exact>
+                获取礼包(old)
+              </StyledLink>
+            </NavItem>
+            <NavItem>
+              <StyledLink to="/gift-old" activeClassName="current" exact>
+                我的礼物(old)
+              </StyledLink>
+            </NavItem>
+            <NavItem>
+              <StyledLink to="/gift" activeClassName="current" exact>
+                我的礼物
+              </StyledLink>
+            </NavItem>
+            <NavItem>
+              <StyledLink to="/setup" activeClassName="current" exact>
+                设置账户(old)
+              </StyledLink>
+            </NavItem>
+            <NavItem>
+              <StyledLink to="/create" activeClassName="current" exact>
+                创建礼包
+              </StyledLink>
+            </NavItem>
+            <NavItem>
+              <SignInOutButton user={sessionUser}></SignInOutButton>
+            </NavItem>
+          </Nav>
+        </HeaderWrapper>
+        <Switch>
+          <Route path="/create">
+            <CreatePackagePageV2 />
+          </Route>
+          <Route path="/packages">
+            <GetPackages />
+          </Route>
+          <Route path="/gift-old">
+            <GetGifts />
+          </Route>
+          <Route path="/gift">
+            <MyGiftsPage />
+          </Route>
+          <Route path="/setup">
+            <SetUpAccount />
+          </Route>
+          <Route path="/">
+            <GetPackagesPage />
+          </Route>
+        </Switch>
+      </PackageInfoContext.Provider>
     </Router>
   )
 }

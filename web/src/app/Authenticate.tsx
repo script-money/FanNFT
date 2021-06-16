@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext } from 'react'
 import * as fcl from '@onflow/fcl'
 import Header from './Header'
+import SetupAccount from './SetupAccount'
 
 export type SessionUser = {
   addr: string | null
@@ -31,6 +32,7 @@ const Authenticate = () => {
   return (
     <SessionUserContext.Provider value={user}>
       <Header />
+      <SetupAccount />
     </SessionUserContext.Provider>
   )
 }

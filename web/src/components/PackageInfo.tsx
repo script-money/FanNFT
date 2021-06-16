@@ -1,14 +1,15 @@
 import styled from 'styled-components'
-import { useContext, useEffect, useRef, useState } from 'react'
-import { PackageDataContext } from '../page/CreatePackagePageV2'
+import { useEffect, useRef, useState } from 'react'
 import Countdown from 'react-countdown'
 import { useExternal } from 'ahooks'
 import { Share } from 'react-twitter-widgets'
+import { PackageInfoProps } from '../interfaces'
 
 const PackageInfoWrapper = styled.div`
   border: 1px solid black;
   height: 300px;
-  width: 700px;
+  width: 600px;
+  margin: 10px 40px;
   display: flex;
   flex-direction: column;
 `
@@ -77,10 +78,14 @@ const Content = styled.div`
 `
 
 const Image = styled.div`
-  display: flex;
-  max-width: 200px;
   width: 200px;
+  min-width: 200px;
   height: 200px;
+  min-height: 200px;
+  & > img {
+    width: 100%;
+    height: 100%;
+  }
 `
 
 const Tail = styled.div`
@@ -91,8 +96,8 @@ const Tail = styled.div`
   align-items: center;
 `
 
-const PackageInfo = () => {
-  const packageData = useContext(PackageDataContext)
+const PackageInfo = (props: PackageInfoProps) => {
+  const packageData = props.data
   const [imgUrl, setImgUrl] = useState('')
   const ref = useRef(null)
   const [content, setContent] = useState('')
@@ -117,7 +122,9 @@ const PackageInfo = () => {
         <Title>{packageData.title}</Title>
         <TotalAmount>总量: {packageData.totalNumber}</TotalAmount>
         <TimeWrapper>
-          <LockStatus className="notLocked">{packageData.isLocked ? '已结束' : '进行中'}</LockStatus>
+          <LockStatus className={packageData.isLocked ? 'locked' : 'notLocked'}>
+            {packageData.isLocked ? '已结束' : '进行中'}
+          </LockStatus>
           <DeadLine>
             <Countdown date={packageData.deadline}></Countdown>
           </DeadLine>

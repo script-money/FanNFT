@@ -11,6 +11,7 @@ const StyledMainContent = styled.div`
 `
 
 const ContentWrapper = styled.div`
+  min-width: 640px;
   border: 2px solid black;
   display: flex;
   justify-content: flex-start;

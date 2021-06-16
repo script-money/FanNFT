@@ -9,6 +9,7 @@ import { SessionUserContext } from '../app/Authenticate'
 import { ReplaceAddress, adminAddress } from '../config'
 import * as fcl from '@onflow/fcl'
 import * as t from '@onflow/types'
+import { PackageInfoDisplay } from '../interfaces'
 
 registerLocale('zh', zh)
 
@@ -69,30 +70,6 @@ const ConfirmButton = styled.button`
   margin: 10px;
   background-color: green;
 `
-
-interface PackageData {
-  packageID: number
-  title: string
-  url: string
-  retweet: string
-  keyword: string
-  totalNumber: number
-  createAt: Date
-  deadline: Date
-  isLocked: boolean
-}
-
-export const PackageDataContext = createContext<PackageData>({
-  packageID: -1,
-  title: '示例——礼包名',
-  url: 'https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg',
-  retweet: '示例内容 0x00000000',
-  keyword: '#FanNFT #MYTAG',
-  totalNumber: 99,
-  createAt: new Date(),
-  deadline: new Date(),
-  isLocked: false,
-})
 
 const createPackageTransactionSource = `\
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
@@ -233,21 +210,21 @@ const CreatePackagePageV2 = () => {
             </Field>
           </CreateForm>
           <PreviewWrapper>
-            <PackageDataContext.Provider
-              value={{
-                packageID,
-                title,
-                url,
-                retweet,
-                keyword,
-                totalNumber,
-                createAt,
-                deadline,
-                isLocked,
-              }}
-            >
-              <PackageInfo />
-            </PackageDataContext.Provider>
+            <PackageInfo
+              data={
+                {
+                  packageID,
+                  title,
+                  url,
+                  retweet,
+                  keyword,
+                  totalNumber,
+                  createAt,
+                  deadline,
+                  isLocked,
+                } as PackageInfoDisplay
+              }
+            />
           </PreviewWrapper>
         </Container>
         <Confirm>

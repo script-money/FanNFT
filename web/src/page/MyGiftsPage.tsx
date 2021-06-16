@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect, useMemo } from 'react'
 import * as fcl from '@onflow/fcl'
 import * as t from '@onflow/types'
 import { ReplaceAddress } from '../config'
@@ -6,11 +6,9 @@ import { ReplaceAddress } from '../config'
 import Card from '../demo/Card'
 import Header from '../demo/Header'
 import Code from '../demo/Code'
-import { SessionUser } from '../app/Authenticate'
-import PackageInfo from '../components/PackageInfo'
+import { SessionUserContext } from '../app/Authenticate'
 import { PackageInfoContext } from '../app/Header'
-
-// import { userStatusContext } from '../context'
+import { IGiftInfo, GiftDataRes, IPackageInfo, IMetaData } from '../interfaces'
 
 const getGiftsScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -27,27 +25,85 @@ pub fun main(address: Address): [UInt64] {
 }
 `
 
+const getGiftInfoScriptSource = `
+import FanNFT from "../../contracts/FanNFT.cdc"
+import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
+
+// 返回用户持有的giftNFT信息
+
+pub fun main(address: Address, giftIDs: [UInt64]): [FanNFT.GiftData] {
+    let collectionRef = getAccount(address).getCapability(FanNFT.GiftPublicPath)
+      .borrow<&{FanNFT.GiftCollectionPublic}>()
+      ?? panic("Could not borrow capability from public collection")
+
+    let giftsData:[FanNFT.GiftData] = []
+
+    for giftID in giftIDs{
+      let giftItem = collectionRef.borrowGift(id: giftID)
+          ?? panic("No such giftID in that collection")
+      giftsData.append(giftItem.data)
+    }
+
+    return giftsData
+}
+`
+
 const getGiftsScript = ReplaceAddress(getGiftsScriptSource)
+const getGiftInfoScriptScript = ReplaceAddress(getGiftInfoScriptSource)
 
 const GetGiftsPage = () => {
   const { state, dispatch } = useContext(PackageInfoContext)
-  const [data, setData] = useState(null)
-  const [user, setUser] = useState<SessionUser>({ loggedIn: false, addr: '' })
+  const sessionUser = useContext(SessionUserContext)
+  const [giftsData, setGiftsData] = useState<IGiftInfo[]>([])
 
-  useEffect(() => fcl.currentUser().subscribe((user: any) => setUser({ ...user })), [])
+  // TODO 先获取Gifts，然后遍历列表去和PackageInfoContext比对拿到title、totalnumber和url
+  // TODO 最后去调用脚本去获取NFT的series和packageID
+
+  useMemo(() => {
+    process()
+  }, [])
+
+  async function process() {
+    try {
+      const resGiftsID = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(sessionUser.addr, t.Address)])])
+      const resDataGiftsID = (await fcl.decode(resGiftsID)) as number[]
+      if (resDataGiftsID.length === 0) {
+        alert('当前用户没有礼物')
+        return
+      }
+      const resGiftsInfo = await fcl.send([
+        fcl.script(getGiftInfoScriptScript),
+        fcl.args([fcl.arg(sessionUser.addr, t.Address), fcl.arg(resDataGiftsID, t.Array(t.UInt64))]),
+      ])
+      const resDataGiftsInfo = (await fcl.decode(resGiftsInfo)) as GiftDataRes[]
+      const giftsDataList = []
+      for (const giftResInfo of resDataGiftsInfo) {
+        const packageInfo = state.data?.filter((packageInfo) => {
+          return packageInfo.packageID === giftResInfo.packageID
+        })[0]
+        const metadata = JSON.parse(packageInfo!.metadata) as IMetaData
+        const giftInfo: IGiftInfo = {
+          title: metadata.title,
+          url: metadata.url,
+          createAt: new Date(metadata.createAt),
+          packageID: packageInfo!.packageID,
+          totalNumber: packageInfo!.totalNumber,
+          NFTID: giftResInfo.id,
+          seriesNum: giftResInfo.serialNumber,
+        }
+        giftsDataList.push(giftInfo)
+      }
+      setGiftsData(giftsDataList)
+      console.log(giftsDataList)
+    } catch (error) {
+      alert(error)
+    }
+  }
 
   const getGiftsButton = async (event: any) => {
     event.preventDefault()
-    console.log('packageInfo: ', state)
 
-    try {
-      const res = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(user.addr, t.Address)])])
-      const resData = await fcl.decode(res)
-      alert(resData)
-      setData(resData)
-    } catch (error) {
-      setData(error)
-    }
+    await process()
   }
 
   return (
@@ -58,7 +114,7 @@ const GetGiftsPage = () => {
 
       <button onClick={getGiftsButton}>GetGifts</button>
 
-      {data && <Code>{JSON.stringify(data, null, 2)}</Code>}
+      {giftsData && <Code>{JSON.stringify(giftsData, null, 2)}</Code>}
     </Card>
   )
 }

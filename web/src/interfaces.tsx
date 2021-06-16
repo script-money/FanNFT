@@ -33,6 +33,24 @@ export interface PackageInfoProps {
   data: PackageInfoDisplay
 }
 
+// 显示单个礼物
+export interface IGiftInfo {
+  title: string
+  url: string
+  createAt: Date
+  packageID: number
+  totalNumber: number
+  NFTID: number
+  seriesNum: number
+}
+
+// 合约返回的礼物信息
+export interface GiftDataRes {
+  id: number
+  packageID: number
+  serialNumber: number
+}
+
 // // 创建上传时的Data
 // export interface Package {
 //   packageID: number

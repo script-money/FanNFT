@@ -1,12 +1,15 @@
-import { useRef, useState, createContext, useContext } from 'react'
+import { useState, createContext, useContext } from 'react'
 import styled from 'styled-components'
 import Content from '../app/Content'
 import PackageInfo from '../components/PackageInfo'
-import { useExternal } from 'ahooks'
 import DatePicker, { registerLocale } from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import zh from 'date-fns/locale/zh-CN'
 import { SessionUserContext } from '../app/Authenticate'
+import { ReplaceAddress, adminAddress } from '../config'
+import * as fcl from '@onflow/fcl'
+import * as t from '@onflow/types'
+
 registerLocale('zh', zh)
 
 const Container = styled.div`
@@ -50,7 +53,25 @@ const ImageLoader = styled.div`
   display: flex;
 `
 
+const ImageContainer = styled.div`
+  max-width: 200px;
+  height: 200px;
+  /* visibility: hidden; */
+`
+
+const Confirm = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const ConfirmButton = styled.button`
+  margin: 10px;
+  background-color: green;
+`
+
 interface PackageData {
+  packageID: number
   title: string
   url: string
   retweet: string
@@ -58,24 +79,42 @@ interface PackageData {
   totalNumber: number
   createAt: Date
   deadline: Date
+  isLocked: boolean
 }
 
 export const PackageDataContext = createContext<PackageData>({
-  title: '',
-  url: '',
-  retweet: '',
-  keyword: '#FanNFT',
-  totalNumber: 0,
+  packageID: -1,
+  title: '示例——礼包名',
+  url: 'https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg',
+  retweet: '示例内容 0x00000000',
+  keyword: '#FanNFT #MYTAG',
+  totalNumber: 99,
   createAt: new Date(),
   deadline: new Date(),
+  isLocked: false,
 })
 
+const createPackageTransactionSource = `\
+import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
+import FanNFT from "../../contracts/FanNFT.cdc"
+transaction(metadata: String, totalNumber: UInt32, adminAccount: Address) {
+  prepare(acct: AuthAccount){
+    log(acct)
+  }
+  execute {
+    let admin = getAccount(adminAccount)
+    let adminRef = admin.getCapability(FanNFT.AdminPublicPath).borrow<&{FanNFT.AdminPublic}>()!
+    adminRef.createPackage(metadata: metadata, totalNumber: totalNumber)
+  }
+}
+`
+
+const setUpAccountTransaction = ReplaceAddress(createPackageTransactionSource)
+
 const CreatePackagePageV2 = () => {
-  // const [sessionUser, _] = useState<SessionUser>(
-  //   () => (sessionStorage.getItem('CURRENT_USER') as unknown) as SessionUser
-  // )
   const sessionUser = useContext(SessionUserContext)
 
+  const [packageID, setPackageID] = useState(-1)
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
   const [retweet, setRetweet] = useState('')
@@ -83,26 +122,59 @@ const CreatePackagePageV2 = () => {
   const [totalNumber, setTotalNumber] = useState(0)
   const [createAt, setCreateAt] = useState(new Date())
   const [deadline, setDeadline] = useState(new Date())
+  const [isLocked, setIsLocked] = useState(false)
+  const [transaction, setTransaction] = useState(null)
+  const [status, setStatus] = useState('Not started')
 
-  const ref = useRef(null)
+  const OnSubmit = async (event: any) => {
+    if (title === '' || url === '' || retweet === '' || keyword === '') {
+      alert('部分参数未填写请检查参数')
+      return
+    }
+    const metadata = JSON.stringify({
+      title,
+      url,
+      content: retweet,
+      keyWord: keyword,
+      createAt: (Date.now() / 1000) | 0,
+      deadline: (deadline.getTime() / 1000) | 0,
+    })
 
-  const [status, { toggle, load, unload }] = useExternal(url, {
-    type: 'img',
-    target: ref,
-  })
+    event.preventDefault()
+    const blockResponse = await fcl.send([fcl.getLatestBlock()])
+    const block = await fcl.decode(blockResponse)
 
-  // const metaString = useMemo(
-  //   () =>  JSON.stringify({
-  //       title,
-  //       url,
-  //       retweet,
-  //       keyword,
-  //       totalNumber,
-  //       createAt,
-  //       deadline,
-  //     }),
-  //   [title, url, retweet, keyword, totalNumber, deadline]
-  // )
+    try {
+      const { transactionId } = await fcl.send([
+        fcl.transaction(setUpAccountTransaction),
+        fcl.args([
+          fcl.arg(metadata, t.String),
+          fcl.arg(Number(totalNumber), t.UInt32),
+          fcl.arg(adminAddress, t.Address),
+        ]),
+        fcl.proposer(fcl.currentUser().authorization),
+        fcl.authorizations([fcl.currentUser().authorization]),
+        fcl.payer(fcl.currentUser().authorization),
+        fcl.ref(block.id),
+        fcl.limit(999),
+      ])
+
+      setStatus('Transaction sent, waiting for confirmation' + ' trxId: ' + transactionId)
+
+      const unsub = fcl.tx({ transactionId }).subscribe((transaction: React.SetStateAction<null>) => {
+        setTransaction(transaction)
+
+        if (fcl.tx.isSealed(transaction)) {
+          setStatus('Transaction is Sealed')
+          alert('Transaction is Sealed')
+          unsub()
+        }
+      })
+    } catch (error) {
+      alert('Transaction failed: ' + error)
+      setStatus('Transaction failed: ' + error)
+    }
+  }
 
   return (
     <>
@@ -117,13 +189,6 @@ const CreatePackagePageV2 = () => {
               <Title>NFT资源</Title>
               <ImageWrapper>
                 <input onChange={(e) => setUrl(e.target.value)} placeholder="输入URL"></input>
-                <ImageLoader>
-                  <button onClick={() => load()}>preview</button>
-                  <p>
-                    Status: <b>{status}</b>
-                  </p>
-                </ImageLoader>
-                <div ref={ref}></div>
               </ImageWrapper>
             </Field>
             <Field>
@@ -141,7 +206,7 @@ const CreatePackagePageV2 = () => {
               <Title>礼物总数</Title>
               <input
                 type="number"
-                max="100"
+                max="99"
                 onChange={(e) => setTotalNumber((e.currentTarget as any).value)}
                 placeholder="礼物总数"
               ></input>
@@ -153,10 +218,12 @@ const CreatePackagePageV2 = () => {
                 isClearable
                 name="deadline"
                 className={'form-control'}
-                selected={createAt}
-                onChange={(val: any) => {
-                  setDeadline(val)
+                selected={deadline}
+                onChange={(date: Date) => {
+                  setDeadline(date)
                 }}
+                minDate={createAt}
+                maxDate={new Date(Date.now() + 3600 * 1000 * 24 * 7)}
                 showTimeSelect
                 timeFormat="HH:mm"
                 timeIntervals={5}
@@ -168,6 +235,7 @@ const CreatePackagePageV2 = () => {
           <PreviewWrapper>
             <PackageDataContext.Provider
               value={{
+                packageID,
                 title,
                 url,
                 retweet,
@@ -175,12 +243,16 @@ const CreatePackagePageV2 = () => {
                 totalNumber,
                 createAt,
                 deadline,
+                isLocked,
               }}
             >
               <PackageInfo />
             </PackageDataContext.Provider>
           </PreviewWrapper>
         </Container>
+        <Confirm>
+          <ConfirmButton onClick={OnSubmit}>确认创建</ConfirmButton>
+        </Confirm>
       </Content>
     </>
   )

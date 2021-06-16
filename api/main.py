@@ -265,7 +265,7 @@ def periodic(period):
     return scheduler
 
 
-@periodic(60)
+# @periodic(60)
 async def main():
     package_array: cadence.Array = await get_packages_data()  # 从合约获取package_data
     to_mint_packages = get_mint_packages(package_array)  # 解析package_data，得到列表
@@ -280,11 +280,11 @@ async def main():
             package[2], package[3], package[4])  # 从推特获取地址列表
         if len(address_from_twitter_source) == 0:
             logger.info('No new tweets are found')
-            return
+            continue
         selected_address = select_addresses(
             address_from_twitter_source, exists_address, total_number)  # 随机选择地址
         if len(selected_address) == 0:
-            return
+            continue
         await add_address(selected_address, package[1])  # 地址加入到合约中
         await batch_mint_gift(package[1])  # mintNFT发放到各地址
 

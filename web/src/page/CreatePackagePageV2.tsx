@@ -14,50 +14,66 @@ import { PackageInfoDisplay } from '../interfaces'
 registerLocale('zh', zh)
 
 const Container = styled.div`
-  border: 1px solid green;
+  /* border: 1px solid green; */
   display: flex;
 `
 
 const CreateForm = styled.div`
-  border: 1px solid red;
+  /* border: 1px solid red; */
+  margin-left: 20px;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
   flex: 1;
 `
 
 const PreviewWrapper = styled.div`
-  border: 1px solid yellow;
+  /* border: 1px solid yellow; */
   display: flex;
   flex: 1;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 `
 
 const Field = styled.div`
-  border: 1px solid purple;
+  /* border: 1px solid purple; */
   display: flex;
+  margin-bottom: 20px;
 `
 
 const Title = styled.div`
   display: flex;
   color: gray;
   min-width: 100px;
+  font-size: 1.4rem;
 `
 
-const ImageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+const TitleInput = styled.input`
+  width: 300px;
 `
 
-const ImageLoader = styled.div`
-  display: flex;
+const UrlInput = styled.input`
+  width: 500px;
 `
 
-const ImageContainer = styled.div`
-  max-width: 200px;
-  height: 200px;
-  /* visibility: hidden; */
+const ContentTextera = styled.textarea`
+  width: 500px;
+  height: 150px;
+`
+
+const KeyWordInput = styled.input`
+  width: 100px;
+`
+
+const TotalNumberInput = styled.input`
+  width: 100px;
+`
+
+const DatePickerWrapper = styled.div`
+  & .form-control {
+    width: 180px;
+    height: 32px;
+  }
 `
 
 const Confirm = styled.div`
@@ -68,7 +84,17 @@ const Confirm = styled.div`
 
 const ConfirmButton = styled.button`
   margin: 10px;
-  background-color: green;
+  color: gray;
+  background: transparent;
+  border: 2px solid gray;
+  border-radius: 16px;
+  height: 50px;
+  width: 100px;
+  font-size: 16px;
+  &:hover {
+    background-color: RGB(245, 192, 237);
+    color: white;
+  }
 `
 
 const createPackageTransactionSource = `\
@@ -106,6 +132,10 @@ const CreatePackagePageV2 = () => {
   const OnSubmit = async (event: any) => {
     if (title === '' || url === '' || retweet === '' || keyword === '') {
       alert('部分参数未填写请检查参数')
+      return
+    }
+    if (totalNumber < 1 || totalNumber > 99) {
+      alert('礼物数量为1-99')
       return
     }
     const metadata = JSON.stringify({
@@ -160,53 +190,62 @@ const CreatePackagePageV2 = () => {
           <CreateForm>
             <Field>
               <Title>礼包标题</Title>
-              <input onChange={(e) => setTitle(e.target.value)} placeholder="例如：the gift to Flow fans"></input>
+              <TitleInput
+                type="text"
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="例如：the gift to Flow fans"
+              ></TitleInput>
             </Field>
             <Field>
               <Title>NFT资源</Title>
-              <ImageWrapper>
-                <input onChange={(e) => setUrl(e.target.value)} placeholder="输入URL"></input>
-              </ImageWrapper>
+              <UrlInput type="url" onChange={(e) => setUrl(e.target.value)} placeholder="输入URL"></UrlInput>
             </Field>
             <Field>
               <Title>转发内容</Title>
-              <input
+              <ContentTextera
                 onChange={(e) => setRetweet(e.target.value + ' ' + sessionUser.addr)}
                 placeholder="填写转发内容"
-              ></input>
+              ></ContentTextera>
             </Field>
             <Field>
               <Title>关键词</Title>
-              <input onChange={(e) => setKeyword('#FanNFT #' + e.target.value)} placeholder="填写转发内容"></input>
+              <KeyWordInput
+                type="text"
+                onChange={(e) => setKeyword('#FanNFT #' + e.target.value)}
+                placeholder="填写关键词"
+              ></KeyWordInput>
             </Field>
             <Field>
               <Title>礼物总数</Title>
-              <input
+              <TotalNumberInput
                 type="number"
+                min="1"
                 max="99"
                 onChange={(e) => setTotalNumber((e.currentTarget as any).value)}
-                placeholder="礼物总数"
-              ></input>
+                placeholder="填写礼物总数"
+              ></TotalNumberInput>
             </Field>
             <Field>
               <Title>截止日</Title>
-              <DatePicker
-                locale="zh"
-                isClearable
-                name="deadline"
-                className={'form-control'}
-                selected={deadline}
-                onChange={(date: Date) => {
-                  setDeadline(date)
-                }}
-                minDate={createAt}
-                maxDate={new Date(Date.now() + 3600 * 1000 * 24 * 7)}
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={5}
-                timeCaption="time"
-                dateFormat="yyyy-MM-dd h:mm aa"
-              />
+              <DatePickerWrapper>
+                <DatePicker
+                  locale="zh"
+                  isClearable
+                  name="deadline"
+                  className={'form-control'}
+                  selected={deadline}
+                  onChange={(date: Date) => {
+                    setDeadline(date)
+                  }}
+                  minDate={createAt}
+                  maxDate={new Date(Date.now() + 3600 * 1000 * 24 * 7)}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={5}
+                  timeCaption="time"
+                  dateFormat="yyyy-MM-dd h:mm aa"
+                />
+              </DatePickerWrapper>
             </Field>
           </CreateForm>
           <PreviewWrapper>

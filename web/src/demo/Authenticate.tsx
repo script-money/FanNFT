@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import * as fcl from '@onflow/fcl'
-import SetupAccount from '../app/SetupAccount'
+import styled from 'styled-components'
 
 interface SignInOutButtonProps {
   user: User
@@ -18,7 +18,21 @@ const initUserContext: IUserContext = {
   address: '',
 }
 
-// TODO 修改SignInOutButton样式
+const LoginButton = styled.button`
+  margin: 10px;
+  color: gray;
+  background: transparent;
+  border: 2px solid gray;
+  border-radius: 16px;
+  height: 50px;
+  width: 100px;
+  font-size: 16px;
+  &:hover {
+    background-color: RGB(245, 192, 237);
+    color: white;
+  }
+`
+
 export const SignInOutButton = (props: SignInOutButtonProps) => {
   const signInOrOut = async (event: any) => {
     event.preventDefault()
@@ -33,7 +47,7 @@ export const SignInOutButton = (props: SignInOutButtonProps) => {
 
   return (
     <>
-      <button onClick={signInOrOut}>{props.user.loggedIn ? '注销' : '登录/注册'}</button>
+      <LoginButton onClick={signInOrOut}>{props.user.loggedIn ? '注销' : '登录/注册'}</LoginButton>
     </>
   )
 }

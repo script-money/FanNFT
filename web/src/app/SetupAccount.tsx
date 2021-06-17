@@ -46,27 +46,41 @@ const PopBackground = styled.div`
 
 const InfoCard = styled.div`
   width: 500px;
-  height: 300px;
+  height: 200px;
+  border-radius: 12px;
   background-color: white;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 20px;
 `
 
 const InfoTitle = styled.div`
-  font-size: 3rem;
+  font-size: 2rem;
+  flex: 1;
 `
 
 const InfoText = styled.div`
   color: grey;
-`
-
-const CloseButton = styled.button`
-  align-self: flex-end;
+  margin-top: 20px;
+  font-size: 1.5rem;
+  flex: 4;
 `
 
 const OperateButton = styled.button`
-  width: 50px;
-  height: 30px;
+  width: 100px;
+  height: 60px;
+  flex: 1;
+  margin: 10px;
+  color: gray;
+  background: transparent;
+  border: 2px solid gray;
+  border-radius: 12px;
+  font-size: 16px;
+  &:hover {
+    background-color: RGB(245, 192, 237);
+    color: white;
+  }
 `
 
 const setUpAccountTransaction = ReplaceAddress(setUpAccountTransactionSource)
@@ -113,7 +127,7 @@ const SetupAccount = () => {
         <PopBackground>
           <InfoCard>
             <InfoTitle>提示</InfoTitle>
-            <InfoText>进行链上操作前需要初始化账户</InfoText>
+            <InfoText>需要初始化账户存储才能收到礼物</InfoText>
             <OperateButton onClick={sendSetupAccountTransaction}>Approve</OperateButton>
           </InfoCard>
         </PopBackground>

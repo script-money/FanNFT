@@ -1,6 +1,6 @@
 import * as fcl from '@onflow/fcl'
 
-const ISTESTNET = false
+const ISTESTNET = true
 export let adminAddress = '0xf8d6e0586b0a20c7'
 export let nonFungibleTokenAddress = '0xf8d6e0586b0a20c7'
 const nonFungibleTokenPath = '"../../contracts/NonFungibleToken.cdc"'

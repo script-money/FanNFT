@@ -142,7 +142,7 @@ export const createPackage = (event, setUpAccountTransaction, totalNumber, admin
         content: content + ' ', // 在内容后添加地址。如果是用户转发，替换成用户自己的地址
         keyWord: '#FanNFT #' + '[' + keyWord + ']', // 使用hashtag为 "#FanNFT #[keyWord]" 才能从Twitter的API获取
         createAt: (Date.now() / 1000) | 0,
-        deadline,
+        deadline: parseInt(deadline / 1000),
       })
       console.log('metaData', metaData)
       await dispatch(changeMetaData(metaData))

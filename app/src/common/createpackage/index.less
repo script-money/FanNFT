@@ -1,5 +1,5 @@
 .createPackageBox {
-	height: 7.5rem;
+	height: calc(~"100% - 0.6rem");
 	background: #0B2D2B;
 	overflow: hidden;
 
@@ -7,11 +7,12 @@
 		display: flex;
 		justify-content: center;
 		flex-direction: row;
-		padding-top: 0.5rem;
+		padding-top: 0.3rem;
 
 		.one {
+			position: relative;
 			width: 10.8rem;
-			height: 7rem;
+			height: 100%;
 			margin-bottom: 50px;
 			margin-right: 50px;
 			background: #16544F;
@@ -22,7 +23,7 @@
 			.title {
 				position: relative;
 				left: 0.45rem;
-				top: 0.32rem;
+				top: 0.25rem;
 				width: 1.02rem;
 				height: 0.24rem;
 
@@ -35,9 +36,9 @@
 					margin-left: 0.04rem;
 				}
 			}
-			.input1{
+			.inputBox{
 				width: 4rem;
-				margin-top: 0.6rem;
+				margin-top: 0.52rem;
 				margin-left: 0.9rem;
 				span {
 					display: inline-block;
@@ -49,9 +50,152 @@
 					margin-left: 0.04rem;
 					margin-right: 0.2rem;
 				}
-				.inputInput{
+				.input{
 					display: inline-block;
+					width: 2.45rem;
 				}
+				.input2{
+					display: inline-block;
+					width: 2.45rem;
+					margin-left: 0.16rem;
+				}
+			}
+			.previewBox{
+				position: absolute;
+				top: 0.92rem;
+				right: 0.5rem;
+				width: 5rem;
+				height: 4.4rem;
+				.title{
+					position: relative;
+					left: 0.1rem;
+					top: 0rem;
+					height: 0.24rem;
+					span {
+						font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+						font-size: 0.2rem;
+						color: #FFFFFF;
+						text-align: center;
+						line-height: 0.24rem;
+						margin-left: 0.04rem;
+					}
+				}
+				.preview {
+					width: 5.4rem;
+					height: 4.5rem;
+					position: relative;
+					margin-bottom: 50px;
+					margin-right: 50px;
+					background: #16544F;
+					box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.10);
+					border-radius: 0.06rem;
+					overflow: hidden;
+		
+					.title {
+						position: absolute;
+						left: 0.45rem;
+						top: 0.25rem;
+						width: 1.02rem;
+						height: 0.2rem;
+		
+						span {
+							font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+							font-size: 0.18rem;
+							color: #FFFFFF;
+							text-align: center;
+							line-height: 0.18rem;
+							margin-left: 0.04rem;
+						}
+					}
+		
+					.locked {
+						position: absolute;
+						right: 0.45rem;
+						top: 0.25rem;
+						width: 1.02rem;
+						height: 0.2rem;
+		
+						span {
+							font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+							font-size: 0.18rem;
+							color: #FFFFFF;
+							text-align: center;
+							line-height: 0.18rem;
+						}
+					}
+		
+					.contentBox {
+						position: relative;
+						top: 0.6rem;
+						width: 5rem;
+						height: 3rem;
+						margin: 0 auto;
+						border: 1px solid white;
+						border-radius: 5px;
+						overflow: hidden;
+		
+						.contentText {
+							font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+							width: 2rem;
+							height: 2.5rem;
+							font-size: 0.14rem;
+							margin-top: 0.1rem;
+							margin-left: 0.1rem;
+							color: #FFFFFF;
+							text-align: left;
+							word-wrap: break-word;
+							word-break: normal;
+							overflow-y: auto;
+						}
+		
+						.deadlineText {
+							font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+							width: 2rem;
+							height: 0.24rem;
+							font-size: 0.14rem;
+							margin-bottom: 0.1rem;
+							margin-left: 0.1rem;
+							color: #FFFFFF;
+							text-align: left;
+							line-height: 0.24rem;
+						}
+		
+						.imageBox {
+							width: 2.5rem;
+							height: 2.5rem;
+							position: absolute;
+							top: 0.1rem;
+							right: 0.1rem;
+		
+							img {
+								width: 2.5rem;
+								height: 2.5rem;
+								
+							}
+						}
+						.totalText {
+							font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+							position: absolute;
+							bottom: 0.1rem;
+							right: 1.04rem;
+							height: 0.24rem;
+							font-size: 0.14rem;
+							color: #FFFFFF;
+							text-align: left;
+							line-height: 0.24rem;
+						}
+					}
+					.button{
+						position: absolute;
+						bottom: 0.2rem;
+						left: 2rem;
+					}
+				}
+			}
+			.buttonBox{
+				width: 0.6rem;
+				height: 0.5rem;
+				margin: 0.5rem auto;
 			}
 		}
 	}

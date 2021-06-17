@@ -24,7 +24,6 @@ const GetPackages = () => {
 
   const getPackageButton = async (event: any) => {
     event.preventDefault()
-
     try {
       const res = await fcl.send([fcl.script(getPackagesScript)])
       setData(await fcl.decode(res))

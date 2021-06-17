@@ -2,13 +2,12 @@ import { useContext, useState, useEffect, useMemo } from 'react'
 import * as fcl from '@onflow/fcl'
 import * as t from '@onflow/types'
 import { ReplaceAddress } from '../config'
-
-import Card from '../demo/Card'
-import Header from '../demo/Header'
-import Code from '../demo/Code'
+import Content from '../app/Content'
 import { SessionUserContext } from '../app/Authenticate'
 import { PackageInfoContext } from '../app/Header'
-import { IGiftInfo, GiftDataRes, IPackageInfo, IMetaData } from '../interfaces'
+import { GiftInfoDisplay, GiftDataRes, IPackageInfo, IMetaData } from '../interfaces'
+import styled from 'styled-components'
+import GiftInfo from '../components/GiftInfo'
 
 const getGiftsScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -51,13 +50,15 @@ pub fun main(address: Address, giftIDs: [UInt64]): [FanNFT.GiftData] {
 const getGiftsScript = ReplaceAddress(getGiftsScriptSource)
 const getGiftInfoScriptScript = ReplaceAddress(getGiftInfoScriptSource)
 
+const GetGiftsWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`
+
 const GetGiftsPage = () => {
   const { state, dispatch } = useContext(PackageInfoContext)
   const sessionUser = useContext(SessionUserContext)
-  const [giftsData, setGiftsData] = useState<IGiftInfo[]>([])
-
-  // TODO 先获取Gifts，然后遍历列表去和PackageInfoContext比对拿到title、totalnumber和url
-  // TODO 最后去调用脚本去获取NFT的series和packageID
+  const [giftsData, setGiftsData] = useState<GiftInfoDisplay[]>([])
 
   useMemo(() => {
     process()
@@ -82,7 +83,7 @@ const GetGiftsPage = () => {
           return packageInfo.packageID === giftResInfo.packageID
         })[0]
         const metadata = JSON.parse(packageInfo!.metadata) as IMetaData
-        const giftInfo: IGiftInfo = {
+        const giftInfo: GiftInfoDisplay = {
           title: metadata.title,
           url: metadata.url,
           createAt: new Date(metadata.createAt),
@@ -100,22 +101,25 @@ const GetGiftsPage = () => {
     }
   }
 
-  const getGiftsButton = async (event: any) => {
-    event.preventDefault()
-
-    await process()
-  }
-
   return (
-    <Card>
-      <Header>Get Gifts</Header>
+    <Content title="我的礼物">
+      <GetGiftsWrapper>
+        <>
+          {giftsData.map((giftDisplay, key) => (
+            <GiftInfo key={key} data={giftDisplay} />
+          ))}
+        </>
+      </GetGiftsWrapper>
+    </Content>
+    // <Card>
+    //   <Header>Get Gifts</Header>
 
-      <Code>{getGiftsScript}</Code>
+    //   <Code>{getGiftsScript}</Code>
 
-      <button onClick={getGiftsButton}>GetGifts</button>
+    //   <button onClick={getGiftsButton}>GetGifts</button>
 
-      {giftsData && <Code>{JSON.stringify(giftsData, null, 2)}</Code>}
-    </Card>
+    //   {giftsData && <Code>{JSON.stringify(giftsData, null, 2)}</Code>}
+    // </Card>
   )
 }
 

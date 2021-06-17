@@ -34,7 +34,7 @@ export interface PackageInfoProps {
 }
 
 // 显示单个礼物
-export interface IGiftInfo {
+export interface GiftInfoDisplay {
   title: string
   url: string
   createAt: Date
@@ -49,6 +49,10 @@ export interface GiftDataRes {
   id: number
   packageID: number
   serialNumber: number
+}
+
+export interface GiftInfoProps {
+  data: GiftInfoDisplay
 }
 
 // // 创建上传时的Data

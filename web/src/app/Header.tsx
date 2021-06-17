@@ -103,7 +103,7 @@ const Header = () => {
                 首页
               </StyledLink>
             </NavItem>
-            <NavItem>
+            {/* <NavItem>
               <StyledLink to="/packages" activeClassName="current" exact>
                 获取礼包(old)
               </StyledLink>
@@ -112,17 +112,17 @@ const Header = () => {
               <StyledLink to="/gift-old" activeClassName="current" exact>
                 我的礼物(old)
               </StyledLink>
-            </NavItem>
+            </NavItem> */}
             <NavItem>
               <StyledLink to="/gift" activeClassName="current" exact>
                 我的礼物
               </StyledLink>
             </NavItem>
-            <NavItem>
+            {/* <NavItem>
               <StyledLink to="/setup" activeClassName="current" exact>
                 设置账户(old)
               </StyledLink>
-            </NavItem>
+            </NavItem> */}
             <NavItem>
               <StyledLink to="/create" activeClassName="current" exact>
                 创建礼包
@@ -144,18 +144,18 @@ const Header = () => {
           <Route exact path="/create">
             <CreatePackagePageV2 />
           </Route>
-          <Route exact path="/packages">
+          {/* <Route exact path="/packages">
             <GetPackages />
           </Route>
           <Route exact path="/gift-old">
             <GetGifts />
-          </Route>
+          </Route> */}
           <Route exact path="/gift">
             <MyGiftsPage />
           </Route>
-          <Route exact path="/setup">
+          {/* <Route exact path="/setup">
             <SetUpAccount />
-          </Route>
+          </Route> */}
           <Route exact path="/home">
             <GetPackagesPage />
           </Route>

@@ -33,6 +33,7 @@ class Config(object):
                 if self.dev_env == 'emulator':
                     service_account_address_base = data["accounts"]["emulator-account"]["address"]
                     self.service_account_address_str = '0x'+service_account_address_base
+                    self.nft_contract_address = '0x'+service_account_address_base
                     self.service_account_address = Address.from_hex(
                         service_account_address_base
                     )
@@ -46,6 +47,7 @@ class Config(object):
                         data["accounts"]["emulator-account"]["keys"],
                     )
                 elif self.dev_env == 'testnet':
+                    self.nft_contract_address = '0x631e88ae7f1d7c20'  # 测试网的nft合约地址
                     self.service_account_address_str = os.getenv(
                         'TESTNET_ADDRESS')
                     self.service_account_address = Address.from_hex(

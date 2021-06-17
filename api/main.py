@@ -109,7 +109,7 @@ async def batch_mint_gift(package_id: int):
                 "../cadence/transactions/admin/batch_mint_gift.cdc"))
             .read()
             .replace(fanNFTPath, ctx.service_account_address_str)
-            .replace(nonFungibleTokenPath, ctx.service_account_address_str),
+            .replace(nonFungibleTokenPath, ctx.nft_contract_address),
             reference_block_id=block.id,
             payer=ctx.service_account_address,
             proposal_key=ProposalKey(
@@ -175,9 +175,9 @@ def get_address_from_twitter(keyword: str, start_time: int, end_time: int) -> li
         try:
             api = TwitterAPI(consumer_key, consumer_secret,
                              access_token_key, access_token_secret, proxy_url=proxy_url)
-            tolerance = 0
+            tolerance = 60*30
             if os.getenv('DEV_ENV') == 'emulator':
-                tolerance = 60*60*48  # 为了方便调试，前后时间范围扩大了48小时，生产环境tolerance为0
+                tolerance = 60*60*48  # 为了方便调试，前后时间范围扩大了48小时，生产环境tolerance为5分钟
             tweets: TwitterResponse = api.request(
                 'search/tweets',
                 {'q': f'#FanNFT {keyword} since_time:{start_time-tolerance} until_time:{end_time+tolerance}',
@@ -265,7 +265,7 @@ def periodic(period):
     return scheduler
 
 
-# @periodic(60)
+@periodic(300)  # 5分钟运行一次
 async def main():
     package_array: cadence.Array = await get_packages_data()  # 从合约获取package_data
     to_mint_packages = get_mint_packages(package_array)  # 解析package_data，得到列表

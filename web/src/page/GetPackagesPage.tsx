@@ -74,9 +74,11 @@ const GetPackagesPage = () => {
       <Content title="获取礼包">
         <GetPackageWrapper>
           <>
-            {displayData.map((packageDisplay, key) => (
-              <PackageInfo key={key} data={packageDisplay} />
-            ))}
+            {displayData
+              .sort((a: any, b: any) => (a.deadline > b.deadline ? -1 : b.deadline > a.deadline ? 1 : 0))
+              .map((packageDisplay, key) => (
+                <PackageInfo key={key} data={packageDisplay} />
+              ))}
           </>
         </GetPackageWrapper>
       </Content>

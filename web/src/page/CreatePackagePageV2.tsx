@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import Content from '../app/Content'
 import PackageInfo from '../components/PackageInfo'
@@ -128,6 +128,12 @@ const CreatePackagePageV2 = () => {
   const [isLocked, setIsLocked] = useState(false)
   const [transaction, setTransaction] = useState(null)
   const [status, setStatus] = useState('Not started')
+
+  useEffect(() => {
+    if (status === 'Transaction is Sealed') {
+      window.location.href = '/home'
+    }
+  }, [status])
 
   const OnSubmit = async (event: any) => {
     if (title === '' || url === '' || retweet === '' || keyword === '') {

@@ -3,11 +3,10 @@ import * as fcl from '@onflow/fcl'
 import * as t from '@onflow/types'
 import { ReplaceAddress } from '../config'
 
-import Card from '../components/Card'
-import Header from '../components/Header'
-import Code from '../components/Code'
-
-import { userContext } from './Authenticate'
+import Card from './Card'
+import Header from './Header'
+import Code from './Code'
+import { SessionUser } from '../app/Authenticate'
 
 const getGiftsScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -28,8 +27,7 @@ const getGiftsScript = ReplaceAddress(getGiftsScriptSource)
 
 const GetGifts = () => {
   const [data, setData] = useState(null)
-  const [user, setUser] = useState(null)
-  const context = React.useContext(userContext)
+  const [user, setUser] = useState<SessionUser>({ loggedIn: false, addr: '' })
 
   useEffect(() => fcl.currentUser().subscribe((user: any) => setUser({ ...user })), [])
 
@@ -37,8 +35,9 @@ const GetGifts = () => {
     event.preventDefault()
 
     try {
-      const res = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(context.address, t.Address)])])
-      setData(await fcl.decode(res))
+      const res = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(user.addr, t.Address)])])
+      const resData = await fcl.decode(res)
+      setData(resData)
     } catch (error) {
       setData(error)
     }

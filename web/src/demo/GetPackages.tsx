@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import * as fcl from '@onflow/fcl'
 import { ReplaceAddress } from '../config'
 
-import Card from '../components/Card'
-import Header from '../components/Header'
-import Code from '../components/Code'
+import Card from './Card'
+import Header from './Header'
+import Code from './Code'
 
 const getPackagesScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"

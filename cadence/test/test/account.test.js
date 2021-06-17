@@ -65,10 +65,12 @@ describe("FanNFT", () => {
     )
 
     const metadata = {
-      "name": "discord gift",
+      "title": "discord gift",
       "image": "https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg",
-      "content": "discrd logo 🙂 ${ADDRESS}",
-      "deadline": "2021-05-05 12:00:00"
+      "content": "asddd 0x01cf0e2f2f715450",
+      "keyWord": "#FanNFT #test",
+      "createAt": 1623325141,
+      "deadline": 1623324927
     }
 
     const args = [
@@ -250,5 +252,116 @@ describe("FanNFT", () => {
     ]
     const result = await executeScript({ code: getGiftDataByIdScript, args: args3 })
     expect(result[0]).toMatchObject({ id: 3, packageID: 0, serialNumber: 3 })
+  })
+
+  it("8. Giver create other new package, new address can recieve new gift", async () => {
+    const userAddress = await getAccountAddress("User");
+    const adminAddress = await getAccountAddress("Admin");
+    const fanAddress3 = await getAccountAddress("Fan3");
+    const fanAddress4 = await getAccountAddress("Fan4");
+
+    const setupTransCode1 = await getTransactionCode(
+      {
+        name: 'fans/setup_account',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    await sendTransaction({ code: setupTransCode1, args: [[]], signers: [fanAddress3] })
+
+    const setupTransCode2 = await getTransactionCode(
+      {
+        name: 'fans/setup_account',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    await sendTransaction({ code: setupTransCode2, args: [[]], signers: [fanAddress4] })
+
+    const transCode = await getTransactionCode(
+      {
+        name: 'giver/create_package',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+
+    const metadata = {
+      "title": "discord gift",
+      "image": "https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg",
+      "content": "asddd 0x01cf0e2f2f715450",
+      "keyWord": "#FanNFT #test",
+      "createAt": 1623325141,
+      "deadline": 1623324927
+    }
+
+    const args = [
+      [JSON.stringify(metadata), String],
+      [4, UInt32],
+      [adminAddress, Address]
+    ];
+
+    const signers = [userAddress]
+    const tx = await sendTransaction({ code: transCode, args: args, signers: signers })
+    expect(tx.errorMessage).toBe("");
+    expect(tx.status).toBe(4);
+
+    const getPackagesScript = await getScriptCode(
+      {
+        name: 'user/get_all_packages',
+        addressMap: { FanNFT: adminAddress }
+      }
+    )
+    const result = await executeScript({ code: getPackagesScript })
+    console.log('新生成的package:', result);
+    expect(tx.errorMessage).toBe("");
+    let packageID = result[1].packageID
+    expect(packageID).toBe(1);
+    expect(result[1].totalNumber).toBe(4)
+    expect(result[1].locked).toBe(false)
+
+    const transCode2 = await getTransactionCode(
+      {
+        name: 'admin/add_reward_addresses',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args1 = [
+      [[fanAddress3, fanAddress4], Array(Address)],
+      [packageID, UInt32]
+    ];
+    const tx1 = await sendTransaction({ code: transCode2, args: args1, signers: [adminAddress] })
+    expect(tx1.errorMessage).toBe("");
+    expect(tx1.status).toBe(4);
+
+    const transCode3 = await getTransactionCode(
+      {
+        name: 'admin/batch_mint_gift',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const args2 = [
+      [packageID, UInt32], // packageID to mint
+    ];
+    const tx2 = await sendTransaction({ code: transCode3, args: args2, signers: [adminAddress] })
+    expect(tx2.errorMessage).toBe("");
+    expect(tx2.status).toBe(4);
+
+    const getPackagesScript2 = await getScriptCode(
+      {
+        name: 'user/get_all_packages',
+        addressMap: { FanNFT: adminAddress }
+      }
+    )
+    const result2 = await executeScript({ code: getPackagesScript2 })
+    console.log('第二次mint后的packages:', result2);
+    expect(tx.errorMessage).toBe("");
+    expect(result2[1].locked).toBe(true)
+
+    const getAllGiftIdsScript = await getScriptCode(
+      {
+        name: 'user/get_all_gift_ids_by_address',
+        addressMap: { NonFungibleToken: adminAddress, FanNFT: adminAddress }
+      }
+    )
+    const ownIDs = await executeScript({ code: getAllGiftIdsScript, args: [[fanAddress3, Address]] })
+    expect(ownIDs).toMatchObject([4])
   })
 });

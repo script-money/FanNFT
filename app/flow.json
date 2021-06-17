@@ -1,0 +1,45 @@
+{
+  "emulators": {
+    "default": {
+      "port": 3569,
+      "serviceAccount": "emulator-account"
+    }
+  },
+  "contracts": {
+    "FanNFT": "../cadence/contracts/FanNFT.cdc",
+    "NonFungibleToken": {
+      "source": "../cadence/contracts/NonFungibleToken.cdc",
+      "aliases": {
+        "testnet": "0x631e88ae7f1d7c20"
+      }
+    }
+  },
+  "networks": {
+    "emulator": "127.0.0.1:3569",
+    "mainnet": "access.mainnet.nodes.onflow.org:9000",
+    "testnet": "access.devnet.nodes.onflow.org:9000"
+  },
+  "accounts": {
+    "emulator-account": {
+      "address": "f8d6e0586b0a20c7",
+      "keys": "67ff105cfed60b0db9f95960851b9b96a73a03e972a09195a0efa709a828958b"
+    },
+    "testnet-account": {
+      "address": "${FLOW_ADDRESS}",
+      "keys": "${FLOW_PRIVATE_KEY}"
+    }
+  },
+  "deployments": {
+    "testnet": {
+      "testnet-account": [
+        "FanNFT"
+      ]
+    },
+    "emulator": {
+      "emulator-account": [
+        "NonFungibleToken",
+        "FanNFT"
+      ]
+    }
+  }
+}

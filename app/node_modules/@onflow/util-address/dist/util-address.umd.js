@@ -1,0 +1,2 @@
+!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):n((e=e||self).utilAddress={})}(this,function(e){function n(e){return null==e?null:e.replace(/^0x/,"").replace(/^Fx/,"")}function t(e){return null==e?null:"0x"+n(e)}e.display=function(e){return t(e)},e.sansPrefix=n,e.withPrefix=t});
+//# sourceMappingURL=util-address.umd.js.map

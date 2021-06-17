@@ -1,14 +1,13 @@
-import React, { useState, useEffect, FC, createContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import * as fcl from '@onflow/fcl'
-
-import Card from '../components/Card'
+import styled from 'styled-components'
 
 interface SignInOutButtonProps {
   user: User
 }
 
 interface User {
-  loggedIn: boolean
+  loggedIn: boolean | null
 }
 
 interface IUserContext {
@@ -19,39 +18,54 @@ const initUserContext: IUserContext = {
   address: '',
 }
 
-export const userContext = createContext(initUserContext)
+const LoginButton = styled.button`
+  margin: 10px;
+  color: gray;
+  background: transparent;
+  border: 2px solid gray;
+  border-radius: 16px;
+  height: 50px;
+  width: 100px;
+  font-size: 16px;
+  &:hover {
+    background-color: RGB(245, 192, 237);
+    color: white;
+  }
+`
 
-const SignInOutButton: FC<SignInOutButtonProps> = ({ user: { loggedIn } }) => {
+export const SignInOutButton = (props: SignInOutButtonProps) => {
   const signInOrOut = async (event: any) => {
     event.preventDefault()
 
-    if (loggedIn) {
+    if (props.user.loggedIn) {
       fcl.unauthenticate()
+      localStorage.removeItem('userInitStatus')
     } else {
       fcl.authenticate()
     }
   }
 
-  return <button onClick={signInOrOut}>{loggedIn ? 'Sign Out' : 'Sign In/Up'}</button>
+  return (
+    <>
+      <LoginButton onClick={signInOrOut}>{props.user.loggedIn ? '注销' : '登录/注册'}</LoginButton>
+    </>
+  )
 }
 
 const CurrentUser = () => {
   const [user, setUser] = useState({ loggedIn: false })
-  const context = React.useContext(userContext)
-
   useEffect(
     () =>
       fcl.currentUser().subscribe((user: any) => {
         setUser({ ...user })
-        context.address = user.addr as string
       }),
     []
   )
 
   return (
-    <Card>
+    <>
       <SignInOutButton user={user} />
-    </Card>
+    </>
   )
 }
 

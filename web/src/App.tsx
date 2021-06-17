@@ -1,33 +1,17 @@
 import styled from 'styled-components'
-
-import Section from './components/Section'
-import Header from './components/Header'
-
-import GetPackages from './demo/GetPackages'
-import GetGifts from './demo/GetGifts'
-import Authenticate from './demo/Authenticate'
-import UserInfo from './demo/UserInfo'
-import SetUpAccount from './demo/SetUpAccount'
-import CreatePackage from './demo/CreatePackage'
-
-const Wrapper = styled.div`
-  font-size: 13px;
-  font-family: Arial, Helvetica, sans-serif;
+import Header from './app/Header'
+import Authenticate from './app/Authenticate'
+const FontWrapper = styled.div`
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC,
+    Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
 `
 
 function App() {
   return (
-    <Wrapper>
-      <Section>
-        <Header>FCL wallet interactions</Header>
-        <Authenticate />
-        <UserInfo />
-        <SetUpAccount />
-        <GetPackages />
-        <GetGifts />
-        <CreatePackage />
-      </Section>
-    </Wrapper>
+    <FontWrapper>
+      <Authenticate />
+    </FontWrapper>
   )
 }
 

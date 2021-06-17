@@ -2,11 +2,9 @@ import React, { useState, useContext } from 'react'
 import * as fcl from '@onflow/fcl'
 import { ReplaceAddress } from '../config'
 
-import Card from '../components/Card'
-import Header from '../components/Header'
-import Code from '../components/Code'
-
-import { userContext } from './Authenticate'
+import Card from './Card'
+import Header from './Header'
+import Code from './Code'
 
 const setUpAccountTransactionSource = `\
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
@@ -35,7 +33,6 @@ transaction {
 const setUpAccountTransaction = ReplaceAddress(setUpAccountTransactionSource)
 
 const SetUpAccount = () => {
-  const context = useContext(userContext)
   const [status, setStatus] = useState('Not started')
   const [transaction, setTransaction] = useState(null)
 
@@ -45,7 +42,6 @@ const SetUpAccount = () => {
     setStatus('Resolving...')
 
     const blockResponse = await fcl.send([fcl.getLatestBlock()])
-
     const block = await fcl.decode(blockResponse)
 
     try {
@@ -76,8 +72,6 @@ const SetUpAccount = () => {
   return (
     <Card>
       <Header>set Up Account(Transaction)</Header>
-
-      <Code>Signer is: {context.address}</Code>
 
       <Code>{setUpAccountTransaction}</Code>
 

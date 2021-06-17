@@ -3,34 +3,29 @@ import * as fcl from '@onflow/fcl'
 import * as t from '@onflow/types'
 import { ReplaceAddress, adminAddress } from '../config'
 
-import Card from '../components/Card'
-import Header from '../components/Header'
-import Code from '../components/Code'
-
-import { userContext } from './Authenticate'
+import Card from './Card'
+import Header from './Header'
+import Code from './Code'
+import { SessionUser } from '../app/Authenticate'
 
 const createPackageTransactionSource = `\
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
 import FanNFT from "../../contracts/FanNFT.cdc"
-
 transaction(metadata: String, totalNumber: UInt32, adminAccount: Address) {
   prepare(acct: AuthAccount){
     log(acct)
   }
-
   execute {
     let admin = getAccount(adminAccount)
     let adminRef = admin.getCapability(FanNFT.AdminPublicPath).borrow<&{FanNFT.AdminPublic}>()!
     adminRef.createPackage(metadata: metadata, totalNumber: totalNumber)
   }
 }
-
 `
 
 const setUpAccountTransaction = ReplaceAddress(createPackageTransactionSource)
 
 const CreatePackage = () => {
-  const context = useContext(userContext)
   const [status, setStatus] = useState('Not started')
   const [transaction, setTransaction] = useState(null)
   const [title, setTitle] = useState('')
@@ -40,12 +35,15 @@ const CreatePackage = () => {
   // deadline为了测试截止时间设置为3分钟后，前端需要让用户选择，使用second上传到合约
   const [deadline, setDeadline] = useState((Date.now() / 1000) | (3 * 60))
   const [metadata, setMetadata] = useState('')
+  const [addr, setAddr] = useState<SessionUser>(
+    () => (sessionStorage.getItem('CURRENT_USER') as unknown) as SessionUser
+  )
 
   useEffect(() => {
     const metaString = JSON.stringify({
       title,
       image: 'https://southportlandlibrary.com/wp-content/uploads/2020/11/discord-logo-1024x1024.jpg', // 让用户自己上传url
-      content: content + ' ' + context.address, // 在内容后添加地址。如果是用户转发，替换成用户自己的地址
+      content: content + ' ' + addr, // 在内容后添加地址。如果是用户转发，替换成用户自己的地址
       keyWord: '#FanNFT #' + keyWord, // 使用hashtag为 "#FanNFT #[keyWord]" 才能从Twitter的API获取
       createAt: (Date.now() / 1000) | 0,
       deadline,
@@ -112,7 +110,7 @@ const CreatePackage = () => {
     <Card>
       <Header>Create package(Transaction)</Header>
 
-      <Code>Signer is: {context.address}</Code>
+      <Code>Signer is: {addr}</Code>
 
       <input value={title} onChange={titleHandleChange} placeholder="输入礼包名"></input>
       <input

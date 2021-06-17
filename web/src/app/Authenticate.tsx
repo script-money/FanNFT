@@ -32,7 +32,6 @@ const Authenticate = () => {
   return (
     <SessionUserContext.Provider value={user}>
       <Header />
-      <SetupAccount />
     </SessionUserContext.Provider>
   )
 }

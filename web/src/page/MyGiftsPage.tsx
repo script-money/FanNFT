@@ -8,6 +8,7 @@ import { PackageInfoContext } from '../app/Header'
 import { GiftInfoDisplay, GiftDataRes, IPackageInfo, IMetaData } from '../interfaces'
 import styled from 'styled-components'
 import GiftInfo from '../components/GiftInfo'
+import SetupAccount from '../app/SetupAccount'
 
 const getGiftsScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -69,7 +70,7 @@ const GetGiftsPage = () => {
       const resGiftsID = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(sessionUser.addr, t.Address)])])
       const resDataGiftsID = (await fcl.decode(resGiftsID)) as number[]
       if (resDataGiftsID.length === 0) {
-        alert('当前用户没有礼物')
+        setGiftsData([])
         return
       }
       const resGiftsInfo = await fcl.send([
@@ -102,15 +103,18 @@ const GetGiftsPage = () => {
   }
 
   return (
-    <Content title="我的礼物">
-      <GetGiftsWrapper>
-        <>
-          {giftsData.map((giftDisplay, key) => (
-            <GiftInfo key={key} data={giftDisplay} />
-          ))}
-        </>
-      </GetGiftsWrapper>
-    </Content>
+    <>
+      <SetupAccount />
+      <Content title="我的礼物">
+        <GetGiftsWrapper>
+          <>
+            {giftsData.map((giftDisplay, key) => (
+              <GiftInfo key={key} data={giftDisplay} />
+            ))}
+          </>
+        </GetGiftsWrapper>
+      </Content>
+    </>
     // <Card>
     //   <Header>Get Gifts</Header>
 

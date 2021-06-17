@@ -6,6 +6,7 @@ import PackageInfo from '../components/PackageInfo'
 import { IMetaData, IPackageInfo, PackageInfoDisplay } from '../interfaces'
 import styled from 'styled-components'
 import { PackageInfoContext } from '../app/Header'
+import SetupAccount from '../app/SetupAccount'
 
 const getPackagesScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -68,15 +69,18 @@ const GetPackagesPage = () => {
   }, [])
 
   return (
-    <Content title="获取礼包">
-      <GetPackageWrapper>
-        <>
-          {displayData.map((packageDisplay, key) => (
-            <PackageInfo key={key} data={packageDisplay} />
-          ))}
-        </>
-      </GetPackageWrapper>
-    </Content>
+    <>
+      <SetupAccount />
+      <Content title="获取礼包">
+        <GetPackageWrapper>
+          <>
+            {displayData.map((packageDisplay, key) => (
+              <PackageInfo key={key} data={packageDisplay} />
+            ))}
+          </>
+        </GetPackageWrapper>
+      </Content>
+    </>
   )
 }
 

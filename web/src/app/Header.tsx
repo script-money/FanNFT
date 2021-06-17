@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer } from 'react'
 import styled from 'styled-components'
 import logoPic from '../assets/logo.png'
-import { BrowserRouter as Router, NavLink, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, NavLink, Switch, Route, Redirect } from 'react-router-dom'
 import GetPackagesPage from '../page/GetPackagesPage'
 import CreatePackagePageV2 from '../page/CreatePackagePageV2'
 import { SignInOutButton } from '../demo/Authenticate'
@@ -96,10 +96,10 @@ const Header = () => {
     <Router>
       <PackageInfoContext.Provider value={{ state, dispatch }}>
         <HeaderWrapper>
-          <Logo href="/" />
+          <Logo href="/home" />
           <Nav>
             <NavItem>
-              <StyledLink to="/" activeClassName="current" exact>
+              <StyledLink to="/home" activeClassName="current" exact>
                 首页
               </StyledLink>
             </NavItem>
@@ -134,22 +134,29 @@ const Header = () => {
           </Nav>
         </HeaderWrapper>
         <Switch>
-          <Route path="/create">
+          <Route
+            exact
+            path="/"
+            render={() => {
+              return <Redirect to="/home" />
+            }}
+          />
+          <Route exact path="/create">
             <CreatePackagePageV2 />
           </Route>
-          <Route path="/packages">
+          <Route exact path="/packages">
             <GetPackages />
           </Route>
-          <Route path="/gift-old">
+          <Route exact path="/gift-old">
             <GetGifts />
           </Route>
-          <Route path="/gift">
+          <Route exact path="/gift">
             <MyGiftsPage />
           </Route>
-          <Route path="/setup">
+          <Route exact path="/setup">
             <SetUpAccount />
           </Route>
-          <Route path="/">
+          <Route exact path="/home">
             <GetPackagesPage />
           </Route>
         </Switch>

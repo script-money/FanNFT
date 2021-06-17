@@ -1,6 +1,6 @@
 import { ReplaceAddress } from '../config'
-import { useEffect, useState } from 'react'
-import { useBoolean, useLocalStorageState } from 'ahooks'
+import { useState } from 'react'
+import { useLocalStorageState } from 'ahooks'
 import * as fcl from '@onflow/fcl'
 import styled from 'styled-components'
 

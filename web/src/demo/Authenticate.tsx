@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import * as fcl from '@onflow/fcl'
+import SetupAccount from '../app/SetupAccount'
 
 interface SignInOutButtonProps {
   user: User
@@ -30,7 +31,11 @@ export const SignInOutButton = (props: SignInOutButtonProps) => {
     }
   }
 
-  return <button onClick={signInOrOut}>{props.user.loggedIn ? '注销' : '登录/注册'}</button>
+  return (
+    <>
+      <button onClick={signInOrOut}>{props.user.loggedIn ? '注销' : '登录/注册'}</button>
+    </>
+  )
 }
 
 const CurrentUser = () => {

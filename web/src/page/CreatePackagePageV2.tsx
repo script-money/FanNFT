@@ -143,7 +143,7 @@ const CreatePackagePageV2 = () => {
 
         if (fcl.tx.isSealed(transaction)) {
           setStatus('Transaction is Sealed')
-          alert('Transaction is Sealed')
+          console.log('Transaction is Sealed')
           unsub()
         }
       })

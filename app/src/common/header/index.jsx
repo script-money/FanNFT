@@ -29,7 +29,8 @@ class Header extends Component{
   render(){
     const {
       handleToggleConnectWallet,
-      connectWallet
+      connectWallet,
+      userAddress
     } = this.props;
     return (
       <div className="header">
@@ -67,8 +68,11 @@ class Header extends Component{
             </Col>
             <Col span={1}/>
             <Col span={2} onClick={(event) => handleToggleConnectWallet(event,connectWallet)}>
-              <div className={connectWallet ? "walletNameActive" : "walletName"}>  
-                {connectWallet ? "断开连接" : "连接钱包"}
+              <div className={connectWallet ? "walletNameActive" : "walletName"}>
+                {connectWallet ? 
+                <span>{userAddress}</span>
+                : 
+                "连接钱包"}
               </div>
             </Col>
             <Col span={1}/>
@@ -82,6 +86,7 @@ class Header extends Component{
 const mapStateToProps = (state) => ({
   connectWallet: state.getIn(['header', 'connectWallet']),
   user: state.getIn(['header', 'user']),
+  userAddress: state.getIn(['header', 'userAddress']),
 });
 
 const mapDispatchToProps = (dispatch) => {

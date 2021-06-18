@@ -1,24 +1,129 @@
 .homeBox {
 	height: calc(~"100% - 0.6rem");
+	min-height: 7.4rem;
 	background: #0B2D2B;
 	overflow: hidden;
 
 	.firstArea {
 		display: flex;
+		width: 13rem;
+		margin: 0 auto;
 		flex-direction: row;
 		justify-content: center;
-		flex-wrap: wrap-reverse;
+		flex-wrap: wrap;
+		justify-content: space-between;
 		padding-top: 0.5rem;
 
 		.one {
 			width: 5.4rem;
-			height: 4.1rem;
+			height: 4.5rem;
+			position: relative;
 			margin-bottom: 50px;
 			margin-right: 50px;
 			background: #16544F;
 			box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.10);
 			border-radius: 0.06rem;
 			overflow: hidden;
+
+			.title {
+				position: absolute;
+				left: 0.45rem;
+				top: 0.25rem;
+				width: 1.02rem;
+				height: 0.2rem;
+
+				span {
+					font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+					font-size: 0.18rem;
+					color: #FFFFFF;
+					text-align: center;
+					line-height: 0.18rem;
+					margin-left: 0.04rem;
+				}
+			}
+
+			.locked {
+				position: absolute;
+				right: 0.45rem;
+				top: 0.25rem;
+				width: 1.02rem;
+				height: 0.2rem;
+
+				span {
+					font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+					font-size: 0.18rem;
+					color: #FFFFFF;
+					text-align: center;
+					line-height: 0.18rem;
+				}
+			}
+
+			.contentBox {
+				position: relative;
+				top: 0.6rem;
+				width: 5rem;
+				height: 3rem;
+				margin: 0 auto;
+				border: 1px solid white;
+				border-radius: 5px;
+				overflow: hidden;
+
+				.contentText {
+					font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+					width: 2rem;
+					height: 2.5rem;
+					font-size: 0.14rem;
+					margin-top: 0.1rem;
+					margin-left: 0.1rem;
+					color: #FFFFFF;
+					text-align: left;
+					word-wrap: break-word;
+					word-break: normal;
+					overflow-y: auto;
+				}
+
+				.deadlineText {
+					font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+					width: 2rem;
+					height: 0.24rem;
+					font-size: 0.14rem;
+					margin-bottom: 0.1rem;
+					margin-left: 0.1rem;
+					color: #FFFFFF;
+					text-align: left;
+					line-height: 0.24rem;
+				}
+
+				.imageBox {
+					width: 2.5rem;
+					height: 2.5rem;
+					position: absolute;
+					top: 0.1rem;
+					right: 0.1rem;
+
+					img {
+						width: 2.5rem;
+						height: 2.5rem;
+						
+					}
+				}
+				.totalText {
+					font-family: HelveticaNeue-Medium, PingFangSC-Medium;
+					position: absolute;
+					bottom: 0.1rem;
+					right: 1.04rem;
+					height: 0.24rem;
+					font-size: 0.14rem;
+					color: #FFFFFF;
+					text-align: left;
+					line-height: 0.24rem;
+				}
+			}
+			.button{
+				position: absolute;
+				bottom: 0.2rem;
+				left: 2rem;
+			}
 		}
 	}
 }

@@ -89,6 +89,9 @@ pub contract FanNFT: NonFungibleToken {
       }
 
       pub fun addRewardAddresses(addressArray:[Address]){
+        pre{
+            UInt32(addressArray.length) <= self.planTotalNumber : "addresses add greater than planTotalNumber"
+        }
         self.rewardAdresses.appendAll(addressArray)
 
         let packageDataToModify = FanNFT.packageDatas[self.packageID]!

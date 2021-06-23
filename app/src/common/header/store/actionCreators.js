@@ -72,6 +72,15 @@ export const getAddress = (address) => ({
   address
 })
 
+export const toggleLanguage = () => ({
+  type: constants.LANGUAGE,
+});
+
+export const getLanguageInfo = (language) => ({
+  type: constants.LANGUAGE_INFO,
+  language
+});
+
 export const getChangeInfoArray = (packageArr, totalNumberArr, rewardAddressArr, lockedArr, giftIDsArr) => ({
   type: constants.CHANGEINFOARRAY,
   packageArr,

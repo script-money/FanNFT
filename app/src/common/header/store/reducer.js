@@ -1,7 +1,9 @@
 import {
   fromJS
-} from 'immutable';
-import * as constants from './constants';
+} from 'immutable'
+import * as constants from './constants'
+// import zh_CN from '../../../locale/zh_CN'
+import en_US from '../../../locale/en_US'
 
 const defaultState = fromJS({
   user: [],
@@ -22,8 +24,10 @@ const defaultState = fromJS({
   rewardAddressArr: [],
   lockedArr: [],
   giftIDsArr: [],
-  userAddress: ''
-});
+  userAddress: '',
+  language: en_US,
+  toggleLanguage: true,
+})
 
 export default (state = defaultState, action) => {
   switch (action.type) {
@@ -87,6 +91,12 @@ export default (state = defaultState, action) => {
         'lockedArr': action.lockedArr,
         'giftIDsArr': action.giftIDsArr,
       })
+    case constants.LANGUAGE:
+      return state.merge({
+        'toggleLanguage': !state.get('toggleLanguage'),
+      })
+    case constants.LANGUAGE_INFO:
+      return state.set('language', action.language)
     default:
       return state;
   }

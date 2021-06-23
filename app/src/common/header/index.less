@@ -2,6 +2,7 @@
   width: 100%;
   height: 0.6rem;
   min-width: 1400px;
+
   .headerBox {
     width: 100%;
     min-width: 1400px;
@@ -13,10 +14,12 @@
     height: 0.6rem;
     line-height: 0.6rem;
     text-align: center;
-    box-shadow: 0 6px 10px 0 rgba(0,0,0,0.40);
-    div{
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.40);
+
+    div {
       height: 0.6rem;
-      .logo{
+
+      .logo {
         width: 0.6rem;
         height: 0.6rem;
         margin: 0 auto;
@@ -24,21 +27,106 @@
         background-size: 0.6rem 0.6rem;
       }
     }
+
     .sicboLogo {
       margin: 0 auto;
       vertical-align: middle;
     }
+
     .walletName {
       cursor: pointer;
       color: white;
       font-size: 0.18rem;
       transition: 1s;
     }
+
     .walletNameActive {
       cursor: pointer;
       color: #F56014;
       font-size: 0.14rem;
       transition: 1s;
+    }
+
+    //language
+    .toggleLanguage {
+      cursor: pointer;
+
+      span {
+        color: white;
+        font-size: 0.18rem;
+        transition: 1s;
+      }
+
+      .arrow {
+        display: inline-block;
+        width: 0.14rem;
+        height: 0.08rem;
+        background: url('../../style/img/ArrowDown.png') no-repeat;
+        background-size: 0.14rem 0.08rem;
+        vertical-align: middle;
+        margin-left: 0.1rem;
+        transition: 0.5s;
+      }
+
+      .languageList {
+        height: 0;
+        transition: 0.3s;
+
+        li {
+          display: none;
+          transition: 0.5s;
+          color: transparent;
+          font-size: 0.18rem;
+        }
+
+        li:hover {
+          color: #F56014;
+        }
+      }
+    }
+
+    .toggleLanguageActive {
+      cursor: pointer;
+
+      span {
+        color: #F56014;
+        font-size: 0.18rem;
+        transition: 1s;
+      }
+
+      .arrow {
+        display: inline-block;
+        width: 0.14rem;
+        height: 0.08rem;
+        background: url('../../style/img/ArrowUpOrange.png') no-repeat;
+        background-size: 0.14rem 0.08rem;
+        vertical-align: middle;
+        margin-left: 0.1rem;
+        transition: 0.5s;
+      }
+
+      .languageList {
+        display: block;
+        height: 0.72rem;
+        background: #103835;
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.40);
+        border-radius: 0.06rem;
+        margin-top: -0.15rem;
+        transition: 0.3s;
+
+        li {
+          display: block;
+          height: 0.36rem;
+          line-height: 0.36rem;
+          color: #ffffff;
+          font-size: 0.18rem;
+          transition: 0.5s;
+        }
+
+        li:hover {
+          color: #F56014;
+        }
+      }
     }
   }
 }

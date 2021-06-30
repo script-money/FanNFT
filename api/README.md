@@ -30,4 +30,5 @@ python3.9 的环境, `pip install -r requirements.txt`
 
 1. 修改 .env 为 `DEV_ENV=testnet`
 2. 参考 .build.example.sh 的指令构建镜像
-3. 使用 `docker run -it -d --name fannft scriptmoney/fannft:0.0.1` 运行程序
+3. 使用 `docker run -it -d --env-file=.env --name fannft scriptmoney/fannft:0.0.2` 运行程序
+`

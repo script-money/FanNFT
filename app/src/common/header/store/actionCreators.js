@@ -36,9 +36,9 @@ export const changeTitle = (e) => ({
   value: e.target.value
 })
 
-export const changeNFT = (e) => ({
+export const changeNFT = (file) => ({
   type: constants.CHANGENFT,
-  value: e.target.value
+  file
 })
 
 export const changeContent = (e) => ({
@@ -81,6 +81,11 @@ export const getLanguageInfo = (language) => ({
   language
 });
 
+export const getGiftsInfo = (giftsDataList) => ({
+  type: constants.GIFTS_INFO,
+  giftsDataList
+});
+
 export const getChangeInfoArray = (packageArr, totalNumberArr, rewardAddressArr, lockedArr, giftIDsArr) => ({
   type: constants.CHANGEINFOARRAY,
   packageArr,
@@ -90,10 +95,12 @@ export const getChangeInfoArray = (packageArr, totalNumberArr, rewardAddressArr,
   giftIDsArr
 })
 
-export const getChangeMetaArray = (metaDataArr) => ({
+export const getChangeMetaArray = (metaDataArr, packageInfoList) => ({
   type: constants.CHANGEMETAARRAY,
-  value: fromJS(metaDataArr)
+  value: fromJS(metaDataArr),
+  packageInfoList
 })
+
 
 export const toggleConnectWallet = (event, connectWallet) => {
   event.preventDefault()
@@ -125,15 +132,23 @@ export const dataInfo = (getPackagesScript) => {
       const rewardAddressArr = []
       const lockedArr = []
       const giftIDsArr = []
-      for(var i = 0; i < resdecode.length; i++) {
+      const packageInfoList = []
+      for (var i = 0; i < resdecode.length; i++) {
         packageArr.push(resdecode[i].packageID)
         metaDataArr.push(JSON.parse(resdecode[i].metadata))
         totalNumberArr.push(resdecode[i].totalNumber)
         rewardAddressArr.push(resdecode[i].rewardAddress)
         lockedArr.push(resdecode[i].locked)
         giftIDsArr.push(resdecode[i].giftIDs)
+
+        const packageInfo = {
+          packageID: resdecode[i].packageID,
+          metadata: resdecode[i].metadata,
+          totalNumber: resdecode[i].totalNumber,
+        }
+        packageInfoList.push(packageInfo)
       }
-      await dispatch(getChangeMetaArray(metaDataArr))
+      await dispatch(getChangeMetaArray(metaDataArr, packageInfoList))
       await dispatch(getChangeInfoArray(packageArr, totalNumberArr, rewardAddressArr, lockedArr, giftIDsArr))
     } catch (error) {
 
@@ -141,15 +156,15 @@ export const dataInfo = (getPackagesScript) => {
   }
 }
 
-export const createPackage = (event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline) => {
+export const createPackage = (event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline, userAddress) => {
   event.preventDefault()
   return async (dispatch) => {
     try {
       let metaData = JSON.stringify({
         title,
         image: nfturl, // 让用户自己上传url
-        content: content + ' ', // 在内容后添加地址。如果是用户转发，替换成用户自己的地址
-        keyWord: '#FanNFT #' + '[' + keyWord + ']', // 使用hashtag为 "#FanNFT #[keyWord]" 才能从Twitter的API获取
+        content: content + ' ' + userAddress, // 在内容后添加地址。如果是用户转发，替换成用户自己的地址
+        keyWord: '#FanNFT #' + keyWord , // 使用hashtag为 "#FanNFT #[keyWord]" 才能从Twitter的API获取
         createAt: (Date.now() / 1000) | 0,
         deadline: parseInt(deadline / 1000),
       })
@@ -177,7 +192,6 @@ export const createPackage = (event, setUpAccountTransaction, totalNumber, admin
       let transactionIdValue = await 'Transaction sent, waiting for confirmation' + ' trxId: ' + transactionId
       await dispatch(changeStatus(transactionIdValue))
 
-
       let unsub = await fcl.tx({
         transactionId
       }).subscribe((transaction) => {
@@ -188,6 +202,45 @@ export const createPackage = (event, setUpAccountTransaction, totalNumber, admin
           unsub()
         }
       })
+    } catch (error) {
+
+    }
+  }
+}
+
+export const giftDataInfo = (getGiftsScript, getGiftInfoScriptScript, userAddress, packageInfoList) => {
+  return async (dispatch) => {
+    try {
+      const resGiftsID = await fcl.send([fcl.script(getGiftsScript), fcl.args([fcl.arg(userAddress, t.Address)])])
+      const resDataGiftsID = await fcl.decode(resGiftsID)
+      if (resDataGiftsID.length === 0) {
+        dispatch(getGiftsInfo([]))
+        return
+      }
+      const resGiftsInfo = await fcl.send([
+        fcl.script(getGiftInfoScriptScript),
+        fcl.args([fcl.arg(userAddress, t.Address), fcl.arg(resDataGiftsID, t.Array(t.UInt64))]),
+      ])
+      const resDataGiftsInfo = await fcl.decode(resGiftsInfo)
+      const giftsDataList = []
+      for (const giftResInfo of resDataGiftsInfo) {
+        const packageInfo = packageInfoList.filter((packageInfoList) => {
+          return packageInfoList.packageID === giftResInfo.packageID
+        })[0]
+        const metadata = JSON.parse(packageInfo.metadata)
+        const giftInfo = {
+          title: metadata.title,
+          url: metadata.url,
+          createAt: new Date(metadata.createAt),
+          packageID: packageInfo.packageID,
+          totalNumber: packageInfo.totalNumber,
+          NFTID: giftResInfo.id,
+          seriesNum: giftResInfo.serialNumber,
+        }
+        giftsDataList.push(giftInfo)
+      }
+      await dispatch(getGiftsInfo(giftsDataList))
+      console.log(giftsDataList)
     } catch (error) {
 
     }

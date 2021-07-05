@@ -12,5 +12,6 @@ const zh_CN = {
   Preview: '预览',
   Progress: '进行中',
   Create: '创   建',
+  UploadPng: '只允许上传图片',
 }
 export default zh_CN;

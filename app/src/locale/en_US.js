@@ -12,6 +12,7 @@ const en_US = {
   Preview: 'Preview',
   Progress: 'Progress',
   Create: 'Create',
+  UploadPng: 'Upload png only',
 }
 
 export default en_US;  

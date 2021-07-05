@@ -1,27 +1,12 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { Button } from 'antd';
+import { Button } from 'antd'
 import { ReplaceAddress } from '../../config'
 import { actionCreatorsHeader } from '../header/store'
 import './index.less'
-
-const createPackageTransactionSource = `\
-import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
-import FanNFT from "../../contracts/FanNFT.cdc"
-transaction(metadata: String, totalNumber: UInt32, adminAccount: Address) {
-  prepare(acct: AuthAccount){
-    log(acct)
-  }
-  execute {
-    let admin = getAccount(adminAccount)
-    let adminRef = admin.getCapability(FanNFT.AdminPublicPath).borrow<&{FanNFT.AdminPublic}>()!
-    adminRef.createPackage(metadata: metadata, totalNumber: totalNumber)
-  }
-}
-`
-
-const setUpAccountTransaction = ReplaceAddress(createPackageTransactionSource)
+import { Share } from 'react-twitter-widgets'
+import { FormattedMessage } from 'react-intl'
 
 const getPackagesScriptSource = `
 import FanNFT from "../../contracts/FanNFT.cdc"
@@ -42,7 +27,6 @@ class Home extends PureComponent {
     this.state = {
       left: 0
     }
-    // this.props.handleDataInfo = this.props.handleDataInfo.bind(this)
   }
 
   componentDidMount() {
@@ -51,25 +35,24 @@ class Home extends PureComponent {
 
   render() {
     const {
-      handleDataInfo,
       packageArr,
       metaDataArr,
       totalNumberArr,
-      rewardAddressArr,
       lockedArr,
-      giftIDsArr,
+      userAddress
     } = this.props
     const packageArrJS = packageArr.toJS()
     const lockedArrJS = lockedArr.toJS()
+    const metaDataArrJS = metaDataArr.toJS()
+    const totalNumberArrJS = totalNumberArr.toJS()
     return (
       <div className="homeBox">
         <div className="firstArea">
           {packageArrJS !== null ?
             packageArrJS.map((item, index) => {
-              const metaDataArrJS = metaDataArr.toJS()
-              const totalNumberArrJS = totalNumberArr.toJS()
-              // const end = moment.unix((metaDataArrJS[index].deadline)).format('YYYY/MM/DD hh:mm:ss')
-              const end = moment((metaDataArrJS[index].deadline)).format('YYYY/MM/DD HH:mm:ss')
+              const retweet = metaDataArrJS[index].content + ' ' + userAddress + ' ' + metaDataArrJS[index].keyWord
+              const end = moment.unix((metaDataArrJS[index].deadline)).format('YYYY/MM/DD hh:mm:ss')
+              // const end = moment((metaDataArrJS[index].deadline)).format('YYYY/MM/DD HH:mm:ss')
               return (
                 packageArr !== "" ?
                   <div className="one" key={index}>
@@ -77,15 +60,40 @@ class Home extends PureComponent {
                       <span>{metaDataArrJS[index].title}</span>
                     </div>
                     <div className="locked">
-                      <span>{lockedArrJS[index] ? "已结束" : "进行中"}</span>
+                      <span>{lockedArrJS[index] ?
+                        <FormattedMessage
+                          id='End'
+                          defaultMessage="End"
+                        />
+                        :
+                        <FormattedMessage
+                          id='Progress'
+                          defaultMessage="Progress"
+                        />
+                      }</span>
                     </div>
                     <div className="contentBox">
-                      <div className="contentText">转发内容{metaDataArrJS[index].content}</div>
-                      <div className="deadlineText">截止日期 {end}</div>
+                      <div className="contentText">
+                        <FormattedMessage
+                          id='Content'
+                          defaultMessage="Content"
+                        />：
+                        {metaDataArrJS[index].content}</div>
+                      <div className="deadlineText">
+                        <FormattedMessage
+                          id='Deadline'
+                          defaultMessage="Deadline"
+                        />:
+                        {end}</div>
                       <div className="imageBox">
                         <img src={metaDataArrJS[index].image} alt="" />
                       </div>
-                      <div className="totalText">总量 {totalNumberArrJS[index]}</div>
+                      <div className="totalText">
+                        <FormattedMessage
+                          id='GiftNumber'
+                          defaultMessage="Gift Number"
+                        />:
+                         {totalNumberArrJS[index]}</div>
                     </div>
                     {
                       lockedArrJS[index] ?
@@ -96,9 +104,10 @@ class Home extends PureComponent {
                         </div>
                         :
                         <div className="button">
-                          <Button type="primary" shape="round" size="large">
+                          {/* <Button type="primary" shape="round" size="large">
                             转发到我的推特
-                        </Button>
+                        </Button> */}
+                          <Share url="https://fannft.eth.link" username="reactjs" options={{ text: retweet, size: 'large' }}/>
                         </div>
                     }
 
@@ -125,6 +134,7 @@ const mapStateToProps = (state) => ({
   rewardAddressArr: state.getIn(['header', 'rewardAddressArr']),
   lockedArr: state.getIn(['header', 'lockedArr']),
   giftIDsArr: state.getIn(['header', 'giftIDsArr']),
+  userAddress: state.getIn(['header', 'userAddress']),
 })
 
 const mapDispatchToProps = (dispatch) => {

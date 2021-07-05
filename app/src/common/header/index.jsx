@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import './index.less';
 import { actionCreatorsHeader } from './store';
 import { FormattedMessage } from 'react-intl';
-import * as fcl from '@onflow/fcl';
 import en_US from '../../locale/en_US';
 import zh_CN from '../../locale/zh_CN';
 

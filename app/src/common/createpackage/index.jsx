@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { Input, InputNumber, DatePicker, Button } from 'antd';
-import * as fcl from '@onflow/fcl';
-import * as t from '@onflow/types';
+import { Input, DatePicker, Button, Upload, message } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { ReplaceAddress, adminAddress } from '../../config';
 import { actionCreatorsHeader } from '../header/store';
@@ -10,8 +9,8 @@ import { FormattedMessage } from 'react-intl';
 import 'moment/locale/zh-cn';
 import locale from 'antd/es/date-picker/locale/zh_CN';
 import en_US from '../../locale/en_US';
-import zh_CN from '../../locale/zh_CN';
 import './index.less';
+import { SkynetClient } from "skynet-js";
 
 const createPackageTransactionSource = `\
 import NonFungibleToken from "../../contracts/NonFungibleToken.cdc"
@@ -32,22 +31,40 @@ const setUpAccountTransaction = ReplaceAddress(createPackageTransactionSource)
 
 const { TextArea } = Input
 
+const client = new SkynetClient("https://siasky.net")
+
 class CreatePackage extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
 
     }
-    this.onChange = this.onChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.beforeUpload = this.beforeUpload.bind(this);
   }
 
-  onChange(date, dateString) {
-    console.log(date, dateString);
+  beforeUpload(file) {
+    if (file.type !== 'image/png') {
+      message.error(`${file.name} is not a png file`);
+    }
+    return false;
+  }
+
+  async handleChange(file) {
+    console.log(file.file)
+    try {
+      // upload
+      const fileString = file.file
+      const { skylink } = await client.uploadFile(fileString);
+      const portalUrl = await client.getSkylinkUrl(skylink);
+      await this.props.handleChangeNFT(portalUrl)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   render() {
     const {
-      metadata,
       totalNumber,
       transaction,
       title,
@@ -56,17 +73,15 @@ class CreatePackage extends PureComponent {
       keyWord,
       deadline,
       language,
+      userAddress,
       handleCreatePackage,
       handleChangeTitle,
-      handleChangeNFT,
       handleChangeContent,
       handleKeyWord,
       handleChangeGift,
       handleChangeDeadline
     } = this.props;
     const end = moment((deadline)).format('YYYY/MM/DD HH:mm:ss')
-    console.log(deadline)
-
     return (
       <div className="createPackageBox">
         <div className="firstArea">
@@ -103,12 +118,19 @@ class CreatePackage extends PureComponent {
                 />
               </span>
               <div className="input">
-                {
-                  language === en_US ?
-                    <Input size="middle" placeholder="input the url" bordered={true} onChange={(e) => handleChangeNFT(e)} />
-                    :
-                    <Input size="middle" placeholder="输入URL" bordered={true} onChange={(e) => handleChangeNFT(e)} />
-                }
+                <Upload
+                  listType="picture"
+                  maxCount={1}
+                  beforeUpload={this.beforeUpload}
+                  onChange={this.handleChange}
+                  >
+                  <Button icon={<UploadOutlined />}>
+                    <FormattedMessage
+                      id='UploadPng'
+                      defaultMessage="Upload png only"
+                    />
+                  </Button>
+                </Upload>
               </div>
             </div>
             <div className="inputBox">
@@ -169,9 +191,9 @@ class CreatePackage extends PureComponent {
               <div className="input">
                 {
                   language === en_US ?
-                    <DatePicker showTime onChange={(e) => handleChangeDeadline(e)} />
+                    <DatePicker showTime style={{ width: '2.45rem' }} onChange={(e) => handleChangeDeadline(e)} />
                     :
-                    <DatePicker locale={locale} showTime onChange={(e) => handleChangeDeadline(e)} />
+                    <DatePicker locale={locale} style={{ width: '2.45rem' }} showTime onChange={(e) => handleChangeDeadline(e)} />
                 }
 
               </div>
@@ -221,7 +243,7 @@ class CreatePackage extends PureComponent {
               </div>
             </div>
             <div className="buttonBox">
-              <Button type="primary" shape="round" size="large" onClick={(event) => handleCreatePackage(event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline)}>
+              <Button type="primary" shape="round" size="large" onClick={nfturl !== '' ? (event) => handleCreatePackage(event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline, userAddress) : ''}>
                 <FormattedMessage
                   id='Create'
                   defaultMessage="Create"
@@ -245,18 +267,19 @@ const mapStateToProps = (state) => ({
   keyWord: state.getIn(['header', 'keyWord']),
   deadline: state.getIn(['header', 'deadline']),
   language: state.getIn(['header', 'language']),
+  userAddress: state.getIn(['header', 'userAddress']),
 });
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    handleCreatePackage(event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline) {
-      dispatch(actionCreatorsHeader.createPackage(event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline))
+    handleCreatePackage(event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline, userAddress) {
+      dispatch(actionCreatorsHeader.createPackage(event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline, userAddress))
     },
     handleChangeTitle(e) {
       dispatch(actionCreatorsHeader.changeTitle(e))
     },
-    handleChangeNFT(e) {
-      dispatch(actionCreatorsHeader.changeNFT(e))
+    handleChangeNFT(file) {
+      dispatch(actionCreatorsHeader.changeNFT(file))
     },
     handleChangeContent(e) {
       dispatch(actionCreatorsHeader.changeContent(e))

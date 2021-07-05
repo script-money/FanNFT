@@ -27,9 +27,12 @@ const defaultState = fromJS({
   userAddress: '',
   language: en_US,
   toggleLanguage: true,
+  giftsData: [],
+  packageInfoList: [],
+  giftsDataList: [],
 })
 
-export default (state = defaultState, action) => {
+const reducer = (state = defaultState, action) => {
   switch (action.type) {
     case constants.CONNECTWALLET:
       return state.merge({
@@ -42,7 +45,10 @@ export default (state = defaultState, action) => {
     case constants.DATAINFO:
       return state.set('data', action.resdecode)
     case constants.CHANGEMETAARRAY:
-      return state.set('metaDataArr', action.value)
+      return state.merge({
+        'metaDataArr': action.value,
+        'packageInfoList': action.packageInfoList
+        })
     case constants.CHANGESTATUS:
       return state.merge({
         'status': action.value,
@@ -57,7 +63,7 @@ export default (state = defaultState, action) => {
       })
     case constants.CHANGENFT:
       return state.merge({
-        'nfturl': action.value,
+        'nfturl': action.file,
       })
     case constants.CHANGECONTENT:
       return state.merge({
@@ -83,6 +89,10 @@ export default (state = defaultState, action) => {
       return state.merge({
         'userAddress': action.address,
       })
+    case constants.GIFTS_INFO:
+      return state.merge({
+        'userAddress': action.giftsDataList,
+      })
     case constants.CHANGEINFOARRAY:
       return state.merge({
         'packageArr': action.packageArr,
@@ -101,3 +111,4 @@ export default (state = defaultState, action) => {
       return state;
   }
 }
+export default reducer

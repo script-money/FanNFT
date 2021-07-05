@@ -1,26 +1,29 @@
 # FanNFT
 
-一款能让KOL轻松地给他的粉丝发放NFT礼物的Dapp，使用flow区块链开发
+A Dapp that allows KOL to easily give NFT gifts to their fans, host on [Akash decloud](https://akash.network/), smart contract using [flow blockchain](https://www.onflow.org/), NFT images save on [Skynet](https://siasky.net/)
 
-1. KOL可以设置宣传内容，创建 NFT 礼包
-2. 粉丝只需轻点一下“转发到我的推特”，到截止时不删除推文，就有机会获取 NFT 空投
-3. 服务端会自动爬取推特，随机选择幸运儿并生成 NFT 礼物发送给他们
+1. KOL can set up promotional content and create NFT gift packs
+2. Fans will have a chance to win an NFT drop by simply tapping "Retweet to my Twitter" and not deleting the tweet before the deadline.
+3. The server will automatically crawl the tweets, randomly select the lucky winners and generate NFT gifts to send to them
 
-## 项目架构
+## Project Structure
 
-### 流程
+### Process
 
 ![overview](overview.jpg)
 
+## Folder Description
+
 ### api
 
-使用[flow-python-sdk](https://github.com/janezpodhostnik/flow-py-sdk/)开发，服务端使用Admin的私钥进行签名发送交易，实现“随机选择幸运儿并生成 NFT 礼物发送给他们”。需要手动设置Twitter开发者账户和Admin keys。具体见[api/README.md](./api/README.md)
+Using [flow-python-sdk](https://github.com/janezpodhostnik/flow-py-sdk/) to interact with flow blockchain. The server uses the Admin's private key to sign and send the transaction to "randomly select the lucky winner and generate an NFT gift to send to them". Requires manual setup of Twitter developer account keys. More intro: [api/README.md](./api/README.md)
 
 ### web
 
-参考[fcl-demo](https://github.com/portto/fcl-demo)，只做了简单页面用于测试web端和合约交互的所有接口。使用说明见[web/README.md](./web/README.md)
+Reference [fcl-demo](https://github.com/portto/fcl-demo), currently only simple pages are made to test all interfaces for web side and contract interaction. Instructions for use can be found in[web/README.md](./web/README.md)
 
 ### cadence
 
-核心合约是[FanNFT](./contract/FanNFT.cdc)。transaction中分为giver、admin、fans文件夹，对应不同的角色和权限应该发送的交易。
-使用[flow-js-testing](https://github.com/onflow/flow-js-testing)进行测试，使用说明见[cadence/test/README.md](./cadence/test/README.md)
+The core contract is [contract/FanNFT.cdc](./contract/FanNFT.cdc). Transactions are divided into giver, admin, and fans folders, which correspond to the transactions that should be sent for different roles and permissions.
+Use [flow-js-testing](https://github.com/onflow/flow-js-testing) for testing, for instructions see [cadence/test/README.md](./cadence/test/README.md)
+

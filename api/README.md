@@ -1,33 +1,32 @@
-# FanNFT服务端
+# FanNFT Server
 
-服务端主要实现3个功能，和合约相关的功能由admin签名
+The server side mainly implements 3 functions, and the contract-related functions signed by admin
 
-1. 根据packageData里面的关键词去推特获取地址列表
-2. 地址列表写入到合约中
-3. mint新的nft发放给地址
+1. according to the keywords inside the packageData to tweet to get the address list
+2. write the address list to the contract
+3. mint the new nft send to rewardable address
 
-整个运行逻辑是：
-定时去遍历packadate里面locked为false的资源，如果资源超出截止时间，就根据资源的关键词去推特抓时间范围内的带关键词和地址的tweet，获取地址列表，进行random打乱顺序。然后把乱序后的地址和packageID，通过admin账户签名，发送到合约里去mintNFT并发放到地址列表里。
+The whole operation logic is:
+Timed to iterate through the packadate inside the locked for false resources, if the resource exceeds the deadline, according to the resource keywords to Twitter to grab the tweet with keywords and addresses within the timestamp, get the address list, random to disrupt the order. Then the randomized address and packageID, signed by the admin account, is sent to the contract to mintNFT and issued to the address list.
 
-## 安装
+## Installation
 
-python3.9 的环境, `pip install -r requirements.txt`
+python3.9  `pip install -r requirements.txt`
 
-## 使用方法（emulator）
+## How to use(emulator)
 
-1. 参考web/中的提示，运行模拟器，部署合约，启动dev-wallet，运行web，然后在web端用用户账户去create package
-2. `cp .env.example .env`，然后在`.env`中填入twitter开发者相关的参数
-3. 使用`python main.py`运行，每60秒会对满足条件的package进行mint
+1. Refer to the instructions in web/, run the emulator, deploy the contract, start the dev-wallet, run the web, and then create the package on the web with the user account
+2. `cp .env.example .env`, then fill in the `.env` with the twitter developer related parameters
+3. Use `python main.py` to launch, will mint the package that meets the conditions every 5 min.
 
-## 使用方法（testnet）
+## How to use(testnet)
 
-如果直接运行
+if run directly
 
-1. 修改 .env 为 `DEV_ENV=testnet`
+1. modify .env to `DEV_ENV=testnet`
 2. `python main.py`
 
-如果使用Docker
-
-1. 修改 .env 为 `DEV_ENV=testnet`
-2. 参考 .build.example.sh 的指令构建镜像
-3. 使用 `docker run -it -d --name fannft scriptmoney/fannft:0.0.1` 运行程序
+if use docker
+1. modify .env to `DEV_ENV=testnet`
+2. `sh build.sh` to build image
+3. use `docker run -it -d --env-file=.env --name fannft scriptmoney/fannft:0.0.2` run container

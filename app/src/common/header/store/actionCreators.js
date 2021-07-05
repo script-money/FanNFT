@@ -21,9 +21,10 @@ export const connectWalletWord = (connectWallet) => ({
   connectWallet
 })
 
-export const changeStatus = (value) => ({
+export const changeStatus = (value, num) => ({
   type: constants.CHANGESTATUS,
-  value
+  value,
+  num
 })
 
 export const changeTransaction = (value) => ({
@@ -171,7 +172,7 @@ export const createPackage = (event, setUpAccountTransaction, totalNumber, admin
       console.log('metaData', metaData)
       await dispatch(changeMetaData(metaData))
       let resolveing = 'Resolving...'
-      await dispatch(changeStatus(resolveing))
+      await dispatch(changeStatus(resolveing, 1))
       let blockResponse = await fcl.send([fcl.getLatestBlock()])
       let block = await fcl.decode(blockResponse)
       let {
@@ -190,7 +191,7 @@ export const createPackage = (event, setUpAccountTransaction, totalNumber, admin
         fcl.limit(999),
       ])
       let transactionIdValue = await 'Transaction sent, waiting for confirmation' + ' trxId: ' + transactionId
-      await dispatch(changeStatus(transactionIdValue))
+      await dispatch(changeStatus(transactionIdValue, 2))
 
       let unsub = await fcl.tx({
         transactionId
@@ -199,6 +200,7 @@ export const createPackage = (event, setUpAccountTransaction, totalNumber, admin
         if (fcl.tx.isSealed(transaction)) {
           let sealedValue = 'Transaction is Sealed'
           dispatch(changeStatus(sealedValue))
+          dispatch(changeStatus('Not started', 0))
           unsub()
         }
       })

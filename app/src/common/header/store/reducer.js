@@ -10,6 +10,7 @@ const defaultState = fromJS({
   connectWallet: false,
   data: null,
   status: 'Not started',
+  statusNumber: 0,
   transaction: null,
   title: '',
   totalNumber: 0,
@@ -52,6 +53,7 @@ const reducer = (state = defaultState, action) => {
     case constants.CHANGESTATUS:
       return state.merge({
         'status': action.value,
+        'statusNumber': action.num
       })
     case constants.CHANGETRANSACTION:
       return state.merge({

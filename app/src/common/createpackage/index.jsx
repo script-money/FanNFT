@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { Input, DatePicker, Button, Upload, message } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, LoadingOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { ReplaceAddress, adminAddress } from '../../config';
 import { actionCreatorsHeader } from '../header/store';
@@ -43,6 +43,12 @@ class CreatePackage extends PureComponent {
     this.beforeUpload = this.beforeUpload.bind(this);
   }
 
+  componentDidUpdate() {
+    if(this.props.status === 'Transaction is Sealed') {
+      this.props.history.push('/')
+    }
+  }
+
   beforeUpload(file) {
     if (file.type !== 'image/png') {
       message.error(`${file.name} is not a png file`);
@@ -74,6 +80,7 @@ class CreatePackage extends PureComponent {
       deadline,
       language,
       userAddress,
+      statusNumber,
       handleCreatePackage,
       handleChangeTitle,
       handleChangeContent,
@@ -123,7 +130,7 @@ class CreatePackage extends PureComponent {
                   maxCount={1}
                   beforeUpload={this.beforeUpload}
                   onChange={this.handleChange}
-                  >
+                >
                   <Button icon={<UploadOutlined />}>
                     <FormattedMessage
                       id='UploadPng'
@@ -242,14 +249,23 @@ class CreatePackage extends PureComponent {
                 </div>
               </div>
             </div>
-            <div className="buttonBox">
-              <Button type="primary" shape="round" size="large" onClick={nfturl !== '' ? (event) => handleCreatePackage(event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline, userAddress) : ''}>
-                <FormattedMessage
-                  id='Create'
-                  defaultMessage="Create"
-                />
-              </Button>
-            </div>
+            {
+              statusNumber === 0 ?
+                <div className="buttonBox">
+                  <Button type="primary" shape="round" size="large" onClick={nfturl !== '' ? (event) => handleCreatePackage(event, setUpAccountTransaction, totalNumber, adminAddress, transaction, title, nfturl, content, keyWord, deadline, userAddress) : ''}>
+                    <FormattedMessage
+                      id='Create'
+                      defaultMessage="Create"
+                    />
+                  </Button>
+                </div>
+                :
+                <div className="buttonBox">
+                  <Button type="primary" shape="round" size="large" style={{ width: '90.25px' }}>
+                    <LoadingOutlined style={{ fontSize: '16px' }} />
+                  </Button>
+                </div>
+            }
           </div>
         </div>
       </div>
@@ -268,6 +284,8 @@ const mapStateToProps = (state) => ({
   deadline: state.getIn(['header', 'deadline']),
   language: state.getIn(['header', 'language']),
   userAddress: state.getIn(['header', 'userAddress']),
+  statusNumber: state.getIn(['header', 'statusNumber']),
+  status: state.getIn(['header', 'status']),
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -294,6 +312,9 @@ const mapDispatchToProps = (dispatch) => {
       if (e != null) {
         dispatch(actionCreatorsHeader.changeDeadline(e))
       }
+    },
+    handleChangeStatus(value,num) {
+      dispatch(actionCreatorsHeader.changeStatus(value,num))
     },
   }
 }

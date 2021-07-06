@@ -29,4 +29,4 @@ if run directly
 if use docker
 1. modify .env to `DEV_ENV=testnet`
 2. `sh build.sh` to build image
-3. use `docker run -it -d --env-file=.env --name fannft scriptmoney/fannft:0.0.2` run container
+3. use `docker run -it -d --env-file=.env --name fannft scriptmoney/fannft:0.2.1` run container

@@ -30,4 +30,4 @@ python3.9 的环境, `pip install -r requirements.txt`
 
 1. 修改 .env 为 `DEV_ENV=testnet`, 并填写twitter开发者和admin合约的相关的参数
 2. `sh build.sh`生成镜像
-3. 使用 `docker run -it -d --env-file=.env --name fannft scriptmoney/fannft:0.0.2` 运行
+3. 使用 `docker run -it -d --env-file=.env --name fannft scriptmoney/fannft:0.2.1` 运行

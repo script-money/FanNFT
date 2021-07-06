@@ -9,7 +9,7 @@ transaction(packageID: UInt32) {
     let adminRef: &FanNFT.Admin
 
     prepare(acct: AuthAccount) {
-        self.adminRef = acct.borrow<&FanNFT.Admin>(from: /storage/FanNFTAdmin)!
+        self.adminRef = acct.borrow<&FanNFT.Admin>(from: FanNFT.AdminStoragePath)!
     }
 
     execute { 

@@ -6,7 +6,7 @@ transaction(amount:UFix64) {
   let adminRef: &FanNFT.Admin
 
   prepare(acct: AuthAccount) {
-      self.adminRef = acct.borrow<&FanNFT.Admin>(from: /storage/FanNFTAdmin)
+      self.adminRef = acct.borrow<&FanNFT.Admin>(from: FanNFT.AdminStoragePath)
         ?? panic("No admin resource in storage")
   }
 

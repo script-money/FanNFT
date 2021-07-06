@@ -326,10 +326,10 @@ pub contract FanNFT: NonFungibleToken {
       self.nextGiftID = 0
       self.packageDatas = {}
       self.packages <- {}
-      self.GiftStoragePath = /storage/FanNFTGiftCollection
-      self.GiftPublicPath = /public/FanNFTGiftCollection
-      self.AdminStoragePath = /storage/FanNFTAdmin
-      self.AdminPublicPath = /public/FanNFTAdmin
+      self.GiftStoragePath = /storage/FanNFTGiftCollection_v2
+      self.GiftPublicPath = /public/FanNFTGiftCollection_v2
+      self.AdminStoragePath = /storage/FanNFTAdmin_v2
+      self.AdminPublicPath = /public/FanNFTAdmin_v2
 
       self.account.save<@Admin>(<- create Admin(), to: self.AdminStoragePath)
       self.account.link<&{AdminPublic}>(self.AdminPublicPath, target: self.AdminStoragePath)

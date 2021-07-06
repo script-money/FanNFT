@@ -1,5 +1,5 @@
-// import NonFungibleToken from "./NonFungibleToken.cdc"
-import NonFungibleToken from 0xf8d6e0586b0a20c7 // 模拟器
+import NonFungibleToken from "./NonFungibleToken.cdc"
+// import NonFungibleToken from 0xf8d6e0586b0a20c7 // 模拟器
 // import NonFungibleToken from 0x631e88ae7f1d7c20 // 测试网账户
 
 pub contract FanNFT: NonFungibleToken {
@@ -11,6 +11,8 @@ pub contract FanNFT: NonFungibleToken {
     access(self) var packages: @{UInt32: Package}
 
     pub var nextPackageID: UInt32
+
+    pub var createFee:UFix64
 
     pub var nextGiftID: UInt64
 
@@ -270,7 +272,7 @@ pub contract FanNFT: NonFungibleToken {
     // 用户可以借admin来创建package
     //
     pub resource interface AdminPublic{
-      pub fun createPackage(metadata: String, totalNumber: UInt32)
+        pub fun createPackage(metadata: String, totalNumber: UInt32)
     }
 
     // 标准接口，用于初始化存储空间来接受NFT资源
@@ -299,6 +301,10 @@ pub contract FanNFT: NonFungibleToken {
       pub fun cleanEmptyCollection(emptyCollection: @Collection){
         destroy(emptyCollection)
       }
+
+      pub fun setFee(amount: UFix64){
+        FanNFT.createFee = amount
+      }
     }
 
     pub fun getAllPackages():[FanNFT.PackageData]{
@@ -315,6 +321,7 @@ pub contract FanNFT: NonFungibleToken {
 
     init() {
       self.totalSupply = 0
+      self.createFee = 1.0
       self.nextPackageID = 0
       self.nextGiftID = 0
       self.packageDatas = {}

@@ -78,10 +78,6 @@ async def add_address(addresses: list[str], package_id: int):
             addresses_arg
         ).add_arguments(
             package_id_arg
-        ).with_payload_signature(
-            ctx.service_account_address,
-            ctx.service_account_key_id,
-            ctx.service_account_signer,
         ).with_envelope_signature(
             ctx.service_account_address,
             ctx.service_account_key_id,
@@ -125,10 +121,6 @@ async def batch_mint_gift(package_id: int):
             ctx.service_account_address
         ).add_arguments(
             package_id_arg
-        ).with_payload_signature(
-            ctx.service_account_address,
-            ctx.service_account_key_id,
-            ctx.service_account_signer,
         ).with_envelope_signature(
             ctx.service_account_address,
             ctx.service_account_key_id,

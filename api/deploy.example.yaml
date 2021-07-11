@@ -16,7 +16,7 @@ services:
         as: 80 # any port
         to:
           - global: true
-        
+
 profiles:
   compute:
     fannft:
@@ -33,10 +33,10 @@ profiles:
       attributes:
         host: akash
       signedBy:
-       anyOf:
-        - "akash1365yvmc4s7awdyj3n2sav7xfx76adc6dnmlx63"
+        anyOf:
+          - "akash1365yvmc4s7awdyj3n2sav7xfx76adc6dnmlx63"
       pricing:
-        fannft: 
+        fannft:
           denom: uakt
           amount: 1
 

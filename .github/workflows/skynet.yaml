@@ -1,0 +1,31 @@
+name: FanNFT to Skynet
+on:
+  pull_request:
+  push:
+    branches: [action]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Install dependencies
+        run: yarn
+        working-directory: guide
+
+      - name: Build webapp
+        run: yarn build
+        working-directory: guide
+
+      - name: Deploy to Skynet
+        uses: kwypchlo/deploy-to-skynet-action@main
+        with:
+          upload-dir: guide/public
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          registry-seed: ${{ github.event_name == 'push' && github.ref == 'refs/heads/action' && secrets.REGISTRY_SEED || '' }}

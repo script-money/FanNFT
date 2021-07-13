@@ -469,7 +469,7 @@ TX="write tx want to query"
 + DSEQ=1747223
 ```
 
-查看部署是否已经运行，结尾有state: open说明开启了
+查看部署是否已经运行，结尾有state: open说明开启了。该指令还可以查看部署的其他状态，比如余额（余额不够需要充值）。
 
 ```diff
 - akash query market bid list --owner $ACCOUNT_ADDRESS --node $AKASH_NODE --state open

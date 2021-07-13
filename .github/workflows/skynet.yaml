@@ -2,7 +2,7 @@ name: FanNFT to Skynet
 on:
   pull_request:
   push:
-    branches: [action]
+    branches: [main]
 
 jobs:
   build:
@@ -28,4 +28,4 @@ jobs:
         with:
           upload-dir: guide/out
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          registry-seed: ${{ github.event_name == 'push' && github.ref == 'refs/heads/action' && secrets.REGISTRY_SEED || '' }}
+          registry-seed: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.REGISTRY_SEED || '' }}

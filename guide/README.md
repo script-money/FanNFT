@@ -11,7 +11,7 @@ This repository is guide for how to use above dweb tools to modify dapp.
 
 - [x] Akash CN
 - [ ] Akash EN
-- [ ] Skynet CN
+- [x] Skynet CN
 - [ ] Skynet EN
 - [ ] hns CN
 - [ ] hns EN

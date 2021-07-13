@@ -1,10 +1,10 @@
 ---
 title: 'Skynet在应用开发中的作用'
 excerpt: "Skynet是一个去中心化的存储托管平台，你可以把各种类型的文件存放到上面。本文介绍Skynet的两个用法，如何用Skynet SDK来存放NFT资源，和如何通过Github Action自动部署网站并用handshake链接。"
-coverImage: '/assets/blog/Skynet/cover.png'
+coverImage: '/assets/blog/skynet/cover.png'
 date: '2021-07-13T22:00:00.000Z'
 ogImage:
-  url: '/assets/blog/Skynet/cover.png'
+  url: '/assets/blog/skynet/cover.png'
 ---
 
 Skynet是一个去中心化的存储托管平台，你可以把各种类型的文件存放到上面。本文介绍Skynet的其中两个用法：1.如何用Skynet SDK来存放NFT资源 2. 如何通过Github Action自动部署网站并用handshake链接。

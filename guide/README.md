@@ -10,8 +10,6 @@ This repository is guide for how to use above dweb tools to modify dapp.
 ## todo
 
 - [x] Akash CN
-- [ ] Akash EN
+- [x] Akash EN
 - [x] Skynet CN
-- [ ] Skynet EN
-- [ ] hns CN
-- [ ] hns EN
+- [x] Skynet EN

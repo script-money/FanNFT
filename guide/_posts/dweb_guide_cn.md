@@ -1,15 +1,19 @@
 ---
-title: '部署应用到Akash流程'
-excerpt: 'Akash是一个去中心化容器化应用部署的平台。我所搭建的FanNFT应用有一个自动定时运行的程序，需要使用Akash独特的容器运行能力进行部署，来代替租用传统VPS。本文详细介绍我的Akash服务部署流程。'
-coverImage: '/assets/blog/akash/cover.png'
-date: '2021-07-11T22:00:00.000Z'
+title: '使用 dWeb 工具链开发DApp'
+excerpt: 'Akash和Skynet是区块链应用开发中很实用的两个工具，但鲜有开发者知道他们的作用。本文介绍我是如何在DApp开发中应用两者来实现想要的功能的。'
+coverImage: '/assets/blog/image.webp'
+date: '2021-07-15T22:00:00.000Z'
 ogImage:
-  url: '/assets/blog/akash/cover.png'
+  url: '/assets/blog/image.webp'
 ---
+
+## Part1: 部署应用到Akash流程
 
 Akash是一个去中心化容器化应用部署的平台。我所搭建的FanNFT应用有一个自动定时运行的程序，需要使用Akash独特的服务器端容器运行能力进行部署，来代替租用传统云平台。本文介绍我的Akash服务部署流程。
 
-## 准备工作
+![cover](/assets/blog/akash/cover.png)
+
+### 准备工作
 
 *Akash CLI*：[安装方式](https://docs.akash.network/guides/install)
 完成安装后，输入以下命令，能输出版本号说明安装完成
@@ -31,7 +35,7 @@ Client:
  Version:           20.10.2
 ```
 
-## 分析
+### 分析
 
 完成服务的代码编写，准备部署时，需要考虑以下问题：
 
@@ -70,7 +74,7 @@ if __name__ == "__main__":
 3. 服务间依赖关系：没有其他依赖服务
 4. 暴露端口：无需暴露端口
 
-## 编写Dockerfile
+### 编写Dockerfile
 
 根据实际运行要求编写Dockerfile。如果不清楚建议先学习下Dockerfile编写，网上有很多教程
 
@@ -93,7 +97,7 @@ RUN  pip install --user --no-cache-dir -r requirements.txt
 CMD ["python","main.py"]
 ```
 
-## 推送镜像
+### 推送镜像
 
 Dockerfile完成后，使用**docker build**进行镜像构建。
 因为打包时要依赖项目文件夹外的cadence文件夹，因为我注册dockerhub的用户名是scriptmoney，版本号0.2.1，我使用的指令是
@@ -108,7 +112,7 @@ rm -rf cadence
 
 构建完成后用`docker push [镜像名:tag]` 上传。我使用的是`docker build -t scriptmoney/fannft:0.2.1 --no-cache .`
 
-## 编写SDL
+### 编写SDL
 
 SDL填写部署需要的资源，从官方文档 [multi-tier-app](https://docs.akash.network/deploy/multi-tier-app) 来修改是个不错的选择。
 
@@ -597,3 +601,148 @@ OSEQ=1
 # akash provider lease-events --node $AKASH_NODE --from $KEY_NAME --dseq $DSEQ --home ~/.akash --provider $PROVIDER
 
 ```
+
+## Part2: Skynet在应用开发中的作用
+
+Skynet是一个去中心化的存储托管平台，你可以把各种类型的文件存放到上面。本文介绍Skynet的其中两个用法：1.如何用Skynet SDK来存放NFT资源 2. 如何通过Github Action自动部署网站并用handshake链接。
+
+![Skynet](/assets/blog/skynet/cover.png)
+
+### 如何用Skynet SDK来存放NFT资源
+
+我的应用有一个功能：让用户能上传图片，随后生成NFT，NFT的URL指向图片的存放路径。
+
+这儿有2种解决方案，一是转化成base64直接存放到合约中，优点是容易实现，资源不易丢失。缺点是链上存储昂贵，且每次请求都会获取完整数据，客户端无法使用缓存导致加载慢。
+
+二是采用去中心化存储，常见的有IPFS和Arweave，Skynet也有同样的功能。
+
+我的应用存储NFT采取第二种方式来做。
+
+全部的代码在 [app/src/common/createpackage/index.jsx](https://github.com/script-money/FanNFT/blob/develop/app/src/common/createpackage/index.jsx)，Skynet的核心部分如下。
+
+这是一个js的react组件，有一个按钮，点击后上传文件存放到Skynet，并返回Skylink（访问文件的URL）。
+
+DOM部分代码：
+
+```jsx
+  <div className="input">
+    <Upload
+      listType="picture"
+      maxCount={1}
+      beforeUpload={this.beforeUpload}
+      onChange={this.handleChange}
+    >
+      <Button icon={<UploadOutlined />}>
+        <FormattedMessage
+          id='UploadPng'
+          defaultMessage="Upload png only"
+        />
+      </Button>
+    </Upload>
+  </div>
+```
+
+[Upload](https://ant.design/components/upload/) 是antd的上传文件的组件，beforeUpload是上传前的钩子函数，进行了简单的文件格式检查。
+
+onChange是上传后的回调函数。主要的Skynet相关代码编写在onChange中。
+
+```js
+import { SkynetClient } from "Skynet-js";
+const client = new SkynetClient("https://siasky.net")
+
+/* 省略部分 */
+
+   async handleChange(file) {
+    console.log(file.file)
+    try {
+      // upload
+      const fileString = file.file
+      const { skylink } = await client.uploadFile(fileString);
+      const portalUrl = await client.getSkylinkUrl(skylink);
+      await this.props.handleChangeNFT(portalUrl)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+```
+
+最重要的代码只有4行，很方便就能获取到文件上传到Skynet后的Url。
+
+```js
+impo
+rt { SkynetClient } from "Skynet-js";
+const client = new SkynetClient("https://siasky.net")
+
+const { skylink } = await client.uploadFile(fileString);
+const portalUrl = await client.getSkylinkUrl(skylink);
+```
+
+拿到Url后发送到构建NFT的函数即可。在中国大陆的速度是3秒左右就能读到图片。
+
+### 如何通过 Github Action 自动部署网站并用 handshake 链接
+
+Web应用根据不同的框架，有不同的build指令，运行后会生成一个有静态资源的文件夹。部署静态资源可以托管在vercel、GitHub Page、Fleek等平台。也可以用Akash启动一个nginx容器来运行。Skynet也有类似的功能，下面介绍具体流程。
+
+本网站是由 [Next](https://nextjs.org/) 编写的，通过 `next build && next export` 指令可以生成一个out文件夹，包含网页的所有静态文件。
+
+访问[https://siasky.net/](https://siasky.net/)，首页有个 *Do you want to upload a web app or directory?*，把 *out* 文件夹上传，就可以直接通过生成的 skylink链接[https://vg77obdspdidkveoc1f5h525rksqcs2vegn502prmapt2vsq42taii8.siasky.net/](https://vg77obdspdidkveoc1f5h525rksqcs2vegn502prmapt2vsq42taii8.siasky.net/) 访问页面了。
+
+![Upload](/assets/blog/skynet/upload.png)
+
+当然也可以把该过程自动化，使用 GitHub Action，代码上传后自动build并上传到Skynet。
+
+参考 [kwypchlo/deploy-to-Skynet-action](https://github.com/kwypchlo/deploy-to-Skynet-action) 进行设置。
+
+1. 在项目根目录创建 .github/workflow 的文件夹，在该文件下新建一个.yaml文件
+2. 打开GitHub的代码库页面，选择Settings/Secrets，新建一个名为REGISTRY_SEED的密码。
+3. 填写以下代码到yaml中
+
+```yaml
+name: FanNFT to Skynet
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Install dependencies
+        run: yarn
+        working-directory: guide
+
+      - name: Build webapp
+        run: yarn build
+        working-directory: guide
+
+      - name: Deploy to Skynet
+        uses: kwypchlo/deploy-to-Skynet-action@main
+        with:
+          upload-dir: guide/out
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          registry-seed: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.REGISTRY_SEED || '' }}
+```
+
+其中 *name, branches, working-directory, upload-dir* 根据你的实际情况进行设置。
+
+完成后commit并push代码，在网页的Action界面就能看到Build的情况，并获取skylink和skyns entry。
+
+![build](/assets/blog/skynet/ci.png)
+
+因为 Skylink是根据文件内容生成的，类似md5，如果你改动了文件，链接就会变。如果绑定了域名，需要修改域名指向的地址才能正常访问。
+
+但skyns是不会变的，所以需要把hns域名绑到Skyns，每次更新才能用同样链接访问。具体介绍见[handshake-names](https://support.siasky.net/key-concepts/handshake-names)
+
+![dns](/assets/blog/skynet/dns.png)
+
+我的hns域名是*scriptmoney*，绑定完成后就能通过 [https://scriptmoney.hns.siasky.net/](https://scriptmoney.hns.siasky.net/) 访问。
+
+Skynet还有一个 [skydb](https://siasky.net/docs/#skydb)功能，你可以看做是一个去中心化的键值存储数据库，value指向各Skylink。另外还有个叫[FileBase](https://filebase.com/)的生态项目，底层使用了Skynet，可以当高可用的云数据库用。都是传统应用开发可能会用到的功能，有了类似 Skynet 这样的项目，能很容易迁移到 dWeb 上。

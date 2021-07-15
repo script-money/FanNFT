@@ -6,6 +6,8 @@ A Dapp that allows KOL to easily give NFT gifts to their fans, host on [Akash de
 2. Fans will have a chance to win an NFT drop by simply tapping "Retweet to my Twitter" and not deleting the tweet before the deadline.
 3. The server will automatically crawl the tweets, randomly select the lucky winners and generate NFT gifts to send to them
 
+[Dweb Deployment Guide](https://dweb.script.money/posts/dweb_guide_en)
+
 ## Project Structure
 
 ### Process
@@ -20,10 +22,17 @@ Using [flow-python-sdk](https://github.com/janezpodhostnik/flow-py-sdk/) to inte
 
 ### web
 
-Reference [fcl-demo](https://github.com/portto/fcl-demo), currently only simple pages are made to test all interfaces for web side and contract interaction. Instructions for use can be found in[web/README.md](./web/README.md)
+Web App for FanNFT
+
+### app
+
+Another version FanNFT Web App
 
 ### cadence
 
 The core contract is [contract/FanNFT.cdc](./contract/FanNFT.cdc). Transactions are divided into giver, admin, and fans folders, which correspond to the transactions that should be sent for different roles and permissions.
 Use [flow-js-testing](https://github.com/onflow/flow-js-testing) for testing, for instructions see [cadence/test/README.md](./cadence/test/README.md)
 
+### guide
+
+The documents about how to deploying FanNFT use dWeb toolkits, build by [next.js](https://nextjs.org)
